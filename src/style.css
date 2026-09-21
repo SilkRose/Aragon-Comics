@@ -1,0 +1,509 @@
+@layer reset, colors, styling;
+
+:root {
+	--font-family-base: system-ui;
+	--font-family-base-line-height: 1.5;
+	--font-family-heading: system-ui;
+	--font-family-heading-line-height: 1.1;
+	--font-family-code: monospace;
+	--body-max-width: 75ch;
+}
+
+/* This reset was adapted from Kevin Powell's video: https://www.youtube.com/watch?v=CAPo3HZBWS0 */
+@layer reset {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-moz-text-size-adjust: none;
+		-webkit-text-size-adjust: none;
+		text-size-adjust: none;
+		font-family: var(--font-family-base);
+		color-scheme: light dark;
+		interpolate-size: allow-keywords;
+	}
+
+	body {
+		margin: 0;
+		margin-bottom: 25vh;
+		min-height: 100vh;
+		line-height: var(--font-family-base-line-height);
+	}
+
+	header,
+	main,
+	footer {
+		width: 100%;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	button,
+	input,
+	label {
+		line-height: var(--font-family-heading-line-height);
+	}
+
+	input,
+	button,
+	textarea,
+	select {
+		font-family: inherit;
+		font-size: inherit;
+	}
+
+	textarea:not([rows]) {
+		min-height: 6em;
+	}
+
+	ul[role="list"],
+	ol[role="list"] {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	img,
+	picture {
+		vertical-align: middle;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4 {
+		text-wrap: balance;
+		font-family: var(--font-family-heading);
+	}
+
+	p,
+	li,
+	figcaption {
+		max-width: var(--body-max-width);
+		text-wrap: pretty;
+	}
+
+	code {
+		font-family: var(--font-family-code);
+	}
+
+	:first-child {
+		margin-block-start: 0;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	p,
+	figure,
+	blockquote,
+	dl,
+	dd {
+		margin-block-end: 0;
+	}
+
+	input,
+	button,
+	textarea,
+	select {
+		font: inherit;
+	}
+
+	td,
+	math,
+	time[datetime*=":"] {
+		font-variant-numeric: tabular-nums lining-nums;
+	}
+
+	table {
+		border-collapse: collapse;
+	}
+
+	:target {
+		scroll-margin-block: 32px;
+		scroll-margin-block: 5rlh;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}
+
+@layer colors {
+	body {
+		color: var(--text);
+		background-color: var(--background);
+	}
+
+	.logo {
+		background-color: var(--table-row-1);
+	}
+
+	.nav {
+		background-color: var(--table-row-2);
+	}
+
+	.theme {
+		background-color: var(--table-row-3);
+	}
+
+	button {
+		background-color: var(--primary);
+	}
+
+	input[type="radio"]:checked {
+		background-color: var(--text);
+	}
+
+	a,
+	a:visited {
+		color: var(--text);
+	}
+
+	input[type="radio"] {
+		outline: 2px solid var(--text);
+	}
+
+	input[type="checkbox"] {
+		background-color: var(--background);
+	}
+
+	select,
+	textarea,
+	input {
+		accent-color: var(--accent);
+	}
+
+	input,
+	textarea {
+		caret-color: var(--text);
+	}
+
+	select,
+	textarea,
+	input[type="text"],
+	input[type="date"],
+	input[type="time"] {
+		color: var(--text);
+		border: medium solid var(--table-border);
+		background-color: var(--input-background);
+	}
+
+	input[type="checkbox"],
+	button {
+		accent-color: var(--text);
+	}
+
+	::selection,
+	::-moz-selection {
+		color: var(--background);
+		background: var(--text);
+	}
+
+	blockquote {
+		padding-inline: 1.5rem;
+		border-inline-start: medium solid var(--text);
+	}
+
+	/* Celestia light theme: https://www.realtimecolors.com/?colors=5e2f79-fef6fb-fcd8b6-fdf5b4-f2d9e8 */
+	html {
+		color-scheme: light;
+		--text: hsl(278 44% 33%);
+		--background: hsl(323 80% 98%);
+		--primary: hsl(29 92% 85%);
+		--secondary: hsl(53 95% 85%);
+		--accent: #f2d9e8;
+		--input-background: hsl(323 80% 95%);
+		--table-border: hsl(326 80% 90%);
+		--table-row-1: hsl(194 58% 85%);
+		--table-row-2: hsl(108 73% 86%);
+		--table-row-3: hsl(220 77% 88%);
+		--table-row-4: hsl(289 92% 90%);
+	}
+
+	button {
+		color: var(--text);
+	}
+
+	table {
+		border: 4px solid var(--table-border);
+	}
+
+	th {
+		background-color: var(--table-border);
+	}
+
+	select,
+	textarea,
+	input[type="text"],
+	input[type="date"],
+	input[type="time"] {
+		&:focus-visible {
+			border-color: var(--text);
+		}
+	}
+
+	.list-item:nth-of-type(4n + 1),
+	hr:nth-of-type(4n + 1),
+	tr:nth-child(4n + 1) {
+		background-color: var(--table-row-1);
+	}
+
+	.list-item:nth-of-type(4n + 2),
+	hr:nth-of-type(4n + 2),
+	tr:nth-child(4n + 2) {
+		background-color: var(--table-row-2);
+	}
+
+	.list-item:nth-of-type(4n + 3),
+	hr:nth-of-type(4n + 3),
+	tr:nth-child(4n + 3) {
+		background-color: var(--table-row-3);
+	}
+
+	.list-item:nth-of-type(4n + 4),
+	hr:nth-of-type(4n + 4),
+	tr:nth-child(4n + 4) {
+		background-color: var(--table-row-4);
+	}
+}
+
+@layer styling {
+	header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
+
+	hr {
+		width: 85%;
+		color: transparent;
+		height: 12px;
+		border: none;
+		border-radius: 6px;
+	}
+
+	nav span,
+	header > * {
+		border-radius: 6px;
+	}
+
+	button {
+		border: none;
+		border-radius: 6px;
+		padding: 10px;
+		margin: 5px;
+	}
+
+	.list-item * button {
+		padding: 2px;
+		margin: 2px;
+	}
+
+	.list-item {
+		border-radius: 10px;
+		margin-block: 4px;
+		padding-block: 0.5em;
+		width: min(100%, 75ch);
+		margin-inline: auto;
+		> * {
+			padding-inline: 0.5em;
+			max-width: 75ch;
+			margin-inline: auto;
+		}
+	}
+
+	.left-text {
+		max-width: 900px;
+		font-family: inherit;
+		font-size: inherit;
+		text-align: left;
+		overflow-wrap: break-word;
+		word-break: break-word;
+		white-space: pre-wrap;
+	}
+
+	input:not([type="checkbox"]):not([type="radio"]),
+	textarea,
+	select {
+		padding: 0.5em 1em;
+		min-width: 20ch;
+		max-width: 100%;
+		field-sizing: content;
+		outline: none;
+	}
+
+	input[type="checkbox"] {
+		scale: 120%;
+	}
+
+	textarea {
+		box-sizing: content-box;
+		min-height: 6lh;
+		width: 90%;
+		margin-inline: auto;
+		align-self: stretch;
+	}
+
+	body {
+		max-width: 900px;
+		margin-inline: auto;
+		justify-content: center;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+	}
+
+	main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		max-width: 100%;
+	}
+
+	nav {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: fit-content;
+		gap: 0.5rem;
+	}
+
+	nav span > a {
+		text-decoration: none;
+		display: inline-block;
+		position: relative;
+		z-index: 1;
+		padding-left: 1.75em;
+		margin-left: -1.75em;
+	}
+
+	nav span,
+	fieldset {
+		border: 0;
+		display: flex;
+		gap: 0.5rem;
+		width: fit-content;
+		height: fit-content;
+		padding: 0.5rem;
+		align-items: center;
+	}
+
+	input[type="radio"] {
+		appearance: none;
+		width: 0.75rem;
+		height: 0.75rem;
+		outline-offset: 3px;
+		border-radius: 50%;
+	}
+
+	.column {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	button {
+		-webkit-transform: perspective(1px) translateZ(0);
+		transform: perspective(1px) translateZ(0);
+		-webkit-transition-duration: 0.3s;
+		transition-duration: 0.3s;
+		-webkit-transition-property: transform;
+		transition-property: transform;
+	}
+
+	button:not(:disabled):hover,
+	button:not(:disabled):focus-visible,
+	button:not(:disabled):active {
+		-webkit-transform: scale(1.075);
+		transform: scale(1.075);
+		filter: brightness(1.05);
+	}
+
+	button:disabled {
+		filter: brightness(0.5);
+	}
+
+	@media (max-width: 775px) {
+		header {
+			flex-direction: column;
+			gap: 0.5em;
+		}
+
+		header > * {
+			margin-inline: auto;
+		}
+
+		th {
+			display: none;
+		}
+
+		td {
+			display: block;
+			padding: 0.5rem 1rem;
+		}
+
+		td:first-child {
+			padding-top: 1rem;
+		}
+
+		td:last-child {
+			padding-bottom: 1rem;
+		}
+
+		td::before {
+			content: attr(data-cell);
+			font-weight: 700;
+		}
+
+		table {
+			text-align: left;
+		}
+	}
+}
