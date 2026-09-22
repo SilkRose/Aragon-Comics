@@ -9,27 +9,26 @@ license = "MIT"
 publish = false
 
 [dependencies]
-actix-files = { version = "0.6.10" }
-actix-web = { version = "4.13.0", features = ["macros"] }
-anyhow = { version = "1.0.102" }
+actix-files = { version = "0.7.0" }
+actix-web = { version = "4.15.0", features = ["macros"] }
+anyhow = { version = "1.0.104" }
 base64ct = { version = "1.8.3", features = ["std"] }
-bon = { version = "3.9.1" }
-chrono = { version = "0.4.44", features = ["serde"] }
+bon = { version = "3.10.1" }
+chrono = { version = "0.4.45", features = ["serde"] }
 dotenvy = { version = "0.15.7" }
-lightningcss = { version = "1.0.0-alpha.71" }
+lightningcss = { version = "1.0.0-alpha.72" }
 maud = { version = "0.27.0" }
-pest = { version = "2.8.6" }
-pest-derive = { version = "2.8.6", package = "pest_derive" }
-pony = { git = "https://github.com/SilkRose/Pony", rev = "6240b03c24b3f9c3d7b6ab08578277e69a2667f2" }
-rand = { version = "0.10.1", default-features = false, features = [
+oxipng = { version = "10.2.1", default-features = false, features = ["zopfli"] }
+pony = { git = "https://github.com/SilkRose/Pony", rev = "03cf3b82e88ab86b69cdfd04361175238051463b" }
+rand = { version = "0.10.3", default-features = false, features = [
 	"chacha",
 	"sys_rng",
 ] }
-reqwest = { version = "0.13.2", features = ["json", "form"] }
-serde = { version = "1.0.228", features = ["derive"] }
-serde-json = { version = "1.0.149", package = "serde_json" }
+reqwest = { version = "0.13.5", features = ["json", "form"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde-json = { version = "1.0.151", package = "serde_json" }
 serde-urlencoded = { version = "0.7.1", package = "serde_urlencoded" }
-sqlx = { version = "0.8.6", default-features = false, features = [
+sqlx = { version = "0.9.0", default-features = false, features = [
 	"chrono",
 	"macros",
 	"migrate",
@@ -37,7 +36,7 @@ sqlx = { version = "0.8.6", default-features = false, features = [
 	"runtime-tokio",
 	"tls-rustls",
 ] }
-tokio = { version = "1.52.1", default-features = false }
+tokio = { version = "1.53.1", default-features = false }
 url = "2.5.8"
 
 [profile.dev]
