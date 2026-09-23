@@ -152,25 +152,33 @@
 }
 
 @layer colors {
+	/* Color theme: https://www.realtimecolors.com/?colors=e9cac3-161523-282640-e2b9b1-ffb489 */
+	html {
+		--text: hsl(11, 46%, 84%);
+		--background: hsl(244, 25%, 11%);
+		--primary: hsl(245, 25%, 20%);
+		--secondary: hsl(10, 46%, 79%);
+		--accent: hsl(22, 100%, 77%);
+
+		/* extra colors */
+		--input-background: hsl(244, 25%, 16%);
+		--table-border: hsl(244, 25%, 21%);
+		--table-row-1: hsl(244, 25%, 11%);
+		--table-row-2: hsl(244, 25%, 16%);
+	}
+
 	body {
 		color: var(--text);
 		background-color: var(--background);
-	}
-
-	.logo {
-		background-color: var(--table-row-1);
 	}
 
 	.nav {
 		background-color: var(--accent);
 	}
 
-	.theme {
-		background-color: var(--table-row-3);
-	}
-
 	button {
-		background-color: var(--primary);
+		color: var(--primary);
+		background-color: var(--secondary);
 	}
 
 	input[type="radio"]:checked {
@@ -233,26 +241,6 @@
 		border-inline-start: medium solid var(--text);
 	}
 
-	/* Color theme: https://www.realtimecolors.com/?colors=e9cac3-161523-282640-e2b9b1-ffb489 */
-	html {
-		--text: hsl(11, 46%, 84%);
-		--background: hsl(244, 25%, 11%);
-		--primary: hsl(245, 25%, 20%);
-		--secondary: hsl(10, 46%, 79%);
-		--accent: hsl(22, 100%, 77%);
-
-		--input-background: hsl(323 80% 95%);
-		--table-border: hsl(326 80% 90%);
-		--table-row-1: hsl(194 58% 85%);
-		--table-row-2: hsl(108 73% 86%);
-		--table-row-3: hsl(220 77% 88%);
-		--table-row-4: hsl(289 92% 90%);
-	}
-
-	button {
-		color: var(--text);
-	}
-
 	table {
 		border: 4px solid var(--table-border);
 	}
@@ -271,28 +259,22 @@
 		}
 	}
 
+	hr:nth-of-type(4n + 1) {
+		background-color: var(--accent);
+	}
+
+	hr:nth-of-type(4n + 2) {
+		background-color: var(--secondary);
+	}
+
 	.list-item:nth-of-type(4n + 1),
-	hr:nth-of-type(4n + 1),
 	tr:nth-child(4n + 1) {
 		background-color: var(--table-row-1);
 	}
 
 	.list-item:nth-of-type(4n + 2),
-	hr:nth-of-type(4n + 2),
 	tr:nth-child(4n + 2) {
 		background-color: var(--table-row-2);
-	}
-
-	.list-item:nth-of-type(4n + 3),
-	hr:nth-of-type(4n + 3),
-	tr:nth-child(4n + 3) {
-		background-color: var(--table-row-3);
-	}
-
-	.list-item:nth-of-type(4n + 4),
-	hr:nth-of-type(4n + 4),
-	tr:nth-child(4n + 4) {
-		background-color: var(--table-row-4);
 	}
 }
 
