@@ -49,11 +49,11 @@ pub async fn get_js() -> actix_web::Result<impl Responder> {
 pub async fn get_user(
 	mut db: ThinData<Db>, session: SessionInfo,
 ) -> actix_web::Result<impl Responder> {
-	let user = db.get_user(session.user_id).await?;
+	let users = db.get_all_users().await?;
 	let mut sessions = db.get_all_user_sessions(session.user_id).await?;
 	sessions.sort_by_key(|k| k.last_seen);
 	sessions.reverse();
-	let page = user_settings_html(user, sessions);
+	let page = user_settings_html(users, sessions);
 	Ok(HttpResponse::Ok()
 		.content_type("text/html; charset=utf-8")
 		.body(page))
@@ -79,24 +79,27 @@ pub async fn set_update_user(
 	}
 }
 
-#[get("/user/add/{id}")]
+#[get("/user/add")]
 pub async fn set_add_user(
 	req: HttpRequest, mut db: ThinData<Db>, _: SessionInfo, http_client: ThinData<HttpClient>,
-	fimfic_cfg: ThinData<FimficCfg>, path: Path<i32>,
+	fimfic_cfg: ThinData<FimficCfg>, queries: Query<HashMap<String, i32>>,
 ) -> actix_web::Result<impl Responder> {
-	let user_id = path.into_inner();
-	if db.get_user_opt(user_id).await?.is_none() {
-		let user_update = http_client
-			.get_fimfic_user(user_id, &fimfic_cfg.bearer_token)
-			.await?;
-		db.insert_user(user_id, &user_update.data).await?;
-		Ok(HttpResponse::SeeOther()
-			.append_header(("Location", redirect(req)))
-			.finish())
-	} else {
+	let Some(user_id) = queries.into_inner().get("id").cloned() else {
+		let msg = "Missing id parameter.";
+		return Ok(HttpResponse::BadRequest().body(msg));
+	};
+	let user = db.get_user_opt(user_id).await?;
+	if user.is_some() {
 		let msg = "Unable to add a user who already exists.";
-		Ok(HttpResponse::BadRequest().body(msg))
+		return Ok(HttpResponse::BadRequest().body(msg));
 	}
+	let user_update = http_client
+		.get_fimfic_user(user_id, &fimfic_cfg.bearer_token)
+		.await?;
+	db.insert_user(user_id, &user_update.data).await?;
+	Ok(HttpResponse::SeeOther()
+		.append_header(("Location", redirect(req)))
+		.finish())
 }
 
 #[get("/user/remove/{id}")]

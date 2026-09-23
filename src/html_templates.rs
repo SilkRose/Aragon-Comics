@@ -22,15 +22,15 @@ fn html_builder(
 	.into()
 }
 
-pub fn user_settings_html(user: User, sessions: Vec<Session>) -> String {
+pub fn user_settings_html(users: Vec<User>, sessions: Vec<Session>) -> String {
 	let heading = "User Settings";
 	let title: String = format!("{heading} - {SITE_NAME}");
-	let description = "User sessions, update, and feedback.";
+	let description = "Authorized users, user updates, & user sessions.";
 	let link = format!("{SITE_LINK}/user-settings");
 	let mane = html! {
 		h1 { (heading) }
 		p { (description) }
-		(update_user_html(&user)) hr;
+		(authorized_user_html(users)) hr;
 		(user_sessions_html(sessions))
 	};
 	html_builder()
@@ -40,17 +40,35 @@ pub fn user_settings_html(user: User, sessions: Vec<Session>) -> String {
 		.call()
 }
 
-fn update_user_html(user: &User) -> PreEscaped<String> {
-	let button_text = "Update User Info";
+fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 	html!(
-		h2 { ("Update Info") }
-		p { "This site pulls user information from Fimfiction. \
-			If you update your name or profile picture on Fimfiction, \
-			we have no idea unless you click the button to re-fetch your data." }
-		span class = "row" {
-			(user_inline_html(user))
+		h2 { "Authorized Users" }
+		p { "Update, remove, & add users." }
+		h3 { "User List:" }
+		p { "Click the buttons below to update or remove a user." }
+		@for user in users {
+			span class = "row" {
+			(user_inline_html(&user))
+			@let link = format!("/user/update/{}", user.id);
+			(button_link("Update", &link))
+			@let link = format!("/user/remove/{}", user.id);
+			button
+				type = "button"
+				class = "danger"
+				onclick = (format!("window.location.href='{link}';"))
+					{ "Remove" }
 		}
-		(button_link(button_text, "/user/update"))
+		}
+		p { "This site pulls user information from Fimfiction. \
+			If anyone updates their name or profile picture on Fimfiction, \
+			we have no idea unless you click the button to re-fetch the data." }
+		h3 { "Add Authorized User" }
+		p { "Add a new authorized user with their Fimfiction ID below:" }
+		form class = "row" method = "get" action = "/user/add" {
+			label for = "id" { "User ID:" }
+			(input_text_numeric_required("id", "id", 1, 6))
+			button type = "submit" { "Add" }
+		}
 	)
 }
 
@@ -203,6 +221,20 @@ fn input_text_value_required(
 			minlength = (min)
 			maxlength = (max)
 			value = (value)
+			required {}
+	)
+}
+
+fn input_text_numeric_required(id: &str, name: &str, min: u32, max: u32) -> PreEscaped<String> {
+	html!	(
+		input
+			id = (id)
+			type = "text"
+			name = (name)
+			inputmode = "numeric"
+			pattern = r"\d*"
+			minlength = (min)
+			maxlength = (max)
 			required {}
 	)
 }

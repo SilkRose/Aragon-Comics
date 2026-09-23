@@ -181,6 +181,11 @@
 		background-color: var(--secondary);
 	}
 
+	button.danger {
+		color: var(--primary);
+		background-color: hsl(0, 70%, 69%);
+	}
+
 	input[type="radio"]:checked {
 		background-color: var(--text);
 	}
