@@ -4,7 +4,7 @@ use crate::html_templates::*;
 use crate::structs::*;
 use crate::utility::*;
 use crate::{FimficCfg, HttpClient};
-use actix_web::web::{Query, ThinData};
+use actix_web::web::{Path, Query, ThinData};
 use actix_web::{HttpRequest, HttpResponse, Responder, get, post};
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use std::collections::{HashMap, HashSet};
@@ -59,21 +59,59 @@ pub async fn get_user(
 		.body(page))
 }
 
-#[get("/user/update")]
+#[get("/user/update/{id}")]
 pub async fn set_update_user(
-	req: HttpRequest, mut db: ThinData<Db>, session: SessionInfo,
-	http_client: ThinData<HttpClient>, fimfic_cfg: ThinData<FimficCfg>,
+	req: HttpRequest, mut db: ThinData<Db>, _: SessionInfo, http_client: ThinData<HttpClient>,
+	fimfic_cfg: ThinData<FimficCfg>, path: Path<i32>,
 ) -> actix_web::Result<impl Responder> {
-	let user = db.get_user_opt(session.user_id).await?;
-	if let Some(user) = user
-		&& user.id == session.user_id
-	{
+	let user_id = path.into_inner();
+	if let Ok(user) = db.get_user(user_id).await {
 		let user_update = http_client
 			.get_fimfic_user(user.id, &fimfic_cfg.bearer_token)
 			.await?;
 		db.insert_user(user.id, &user_update.data).await?;
 		Ok(HttpResponse::SeeOther()
 			.append_header(("Location", redirect(req)))
+			.finish())
+	} else {
+		let msg = "Unable to update a user who doesn't exist.";
+		Ok(HttpResponse::BadRequest().body(msg))
+	}
+}
+
+#[get("/user/add/{id}")]
+pub async fn set_add_user(
+	req: HttpRequest, mut db: ThinData<Db>, _: SessionInfo, http_client: ThinData<HttpClient>,
+	fimfic_cfg: ThinData<FimficCfg>, path: Path<i32>,
+) -> actix_web::Result<impl Responder> {
+	let user_id = path.into_inner();
+	if db.get_user_opt(user_id).await?.is_none() {
+		let user_update = http_client
+			.get_fimfic_user(user_id, &fimfic_cfg.bearer_token)
+			.await?;
+		db.insert_user(user_id, &user_update.data).await?;
+		Ok(HttpResponse::SeeOther()
+			.append_header(("Location", redirect(req)))
+			.finish())
+	} else {
+		let msg = "Unable to add a user who already exists.";
+		Ok(HttpResponse::BadRequest().body(msg))
+	}
+}
+
+#[get("/user/remove/{id}")]
+pub async fn set_delete_user(
+	req: HttpRequest, mut db: ThinData<Db>, session: SessionInfo, path: Path<i32>,
+) -> actix_web::Result<impl Responder> {
+	let user_id = path.into_inner();
+	if let Ok(user) = db.get_user(user_id).await {
+		db.delete_user(user.id).await?;
+		let location = match user.id == session.user_id {
+			false => &redirect(req),
+			true => "/logout",
+		};
+		Ok(HttpResponse::SeeOther()
+			.append_header(("Location", location))
 			.finish())
 	} else {
 		let msg = "Unable to update a user who doesn't exist.";

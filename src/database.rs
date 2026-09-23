@@ -136,6 +136,14 @@ pub trait DbExecutor {
 		Ok(self.get_user_opt(id).await?.ok_or_else(db_expect)?)
 	}
 
+	async fn delete_user(&mut self, user_id: i32) -> Result<u64> {
+		Ok(sqlx::query!("DELETE FROM Users WHERE id = $1;", user_id)
+			.execute(self.executor())
+			.await
+			.map_err(delete_err)?
+			.rows_affected())
+	}
+
 	async fn get_all_users(&mut self) -> Result<Vec<User>> {
 		Ok(sqlx::query_as!(
 			User,
