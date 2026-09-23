@@ -21,6 +21,7 @@ pub struct Session {
 pub enum Pages {
 	Home,
 	User,
+	Comics,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

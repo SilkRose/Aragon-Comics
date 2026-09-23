@@ -156,11 +156,14 @@ fn encode_url(title: &str) -> String {
 
 fn header_html(page: Pages, admin: bool) -> PreEscaped<String> {
 	html!(
-		nav {
-			span class = "nav" {
-				// (header_link_html("/", "Home", page == Pages::Home))
-				@if admin {
+		@if admin {
+			nav {
+				span class = "nav" {
+					(header_link_html("/", "Home", page == Pages::Home))
+					"•"
 					(header_link_html("/user", "User", page == Pages::User))
+					"•"
+					(header_link_html("/comics", "Comics", page == Pages::Comics))
 				}
 			}
 		}
@@ -170,10 +173,8 @@ fn header_html(page: Pages, admin: bool) -> PreEscaped<String> {
 fn header_link_html(link: &str, text: &str, checked: bool) -> PreEscaped<String> {
 	html!(
 		@if checked {
-			input type = "radio" name = "page" checked {}
-			a href = (link) { (text) }
+			a href = (link) class = "underlined" { (text) }
 		} @ else {
-			input type = "radio" name = "page" disabled {}
 			a href = (link) { (text) }
 		}
 	)
