@@ -53,10 +53,25 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 			(button_link("Update", &link))
 			@let link = format!("/user/remove/{}", user.id);
 			button
-				type = "button"
 				class = "danger"
-				onclick = (format!("window.location.href='{link}';"))
+				onclick = (format!("openDialog({})", user.id))
 					{ "Remove" }
+			dialog id = (user.id) closedby = "any" {
+				h2 { "Remove User" }
+				p {
+					"Are you sure you want to remove "
+					(user.name)
+					" from the authorized users list?"
+				}
+				span class = "spaced-row" {
+					button onclick = (format!("closeDialog({})", user.id)) { "Close" }
+					button
+						type = "button"
+						class = "danger"
+						onclick = (format!("window.location.href='{link}';"))
+							{ "Remove" }
+				}
+			}
 		}
 		}
 		p { "This site pulls user information from Fimfiction. \

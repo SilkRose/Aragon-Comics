@@ -167,6 +167,7 @@
 		--table-row-2: hsl(244, 25%, 16%);
 	}
 
+	dialog,
 	body {
 		color: var(--text);
 		background-color: var(--background);
@@ -184,6 +185,15 @@
 	button.danger {
 		color: var(--primary);
 		background-color: hsl(0, 70%, 69%);
+	}
+
+	dialog {
+		border-color: var(--table-border);
+	}
+
+	dialog::backdrop {
+		background-color: hsl(0 0% 0% / 0.5);
+		backdrop-filter: blur(2px);
 	}
 
 	input[type="radio"]:checked {
@@ -284,6 +294,10 @@
 }
 
 @layer styling {
+	html {
+		scrollbar-gutter: stable;
+	}
+
 	header {
 		display: flex;
 		flex-direction: row;
@@ -310,6 +324,15 @@
 		border-radius: 6px;
 		padding: 10px;
 		margin: 5px;
+	}
+
+	dialog {
+		max-width: 40ch;
+		border-radius: 6px;
+	}
+
+	html:has(dialog:open) {
+		overflow: hidden;
 	}
 
 	.list-item * button {
@@ -420,6 +443,14 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.spaced-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
 		align-items: center;
 		gap: 0.5rem;
 	}
