@@ -24,12 +24,12 @@ mod rand;
 mod structs;
 mod utility;
 
-pub const PORT: u16 = 6263; // mane
-pub const SITE_NAME: &str = "Census Consensus";
+pub const PORT: u16 = 4663; // hoof
+pub const SITE_NAME: &str = "Aragón Comics";
 pub const SITE_LINK: &str = if cfg!(debug_assertions) {
-	"http://127.0.0.1:6263"
+	"http://127.0.0.1:4663"
 } else {
-	"https://census.silkrose.dev"
+	"https://aragon-comics.silkrose.dev"
 };
 
 #[actix_web::main]
@@ -93,7 +93,7 @@ async fn main() -> Result<()> {
 		println!();
 		println!("You should unset the `CREATE_DEV_SESSION` environment variable in production.");
 		println!(
-			"to set a development session, open this link in your browser: http://localhost:6263/dev-session/{token}"
+			"to set a development session, open this link in your browser: http://localhost:{PORT}/dev-session/{token}"
 		);
 	}
 

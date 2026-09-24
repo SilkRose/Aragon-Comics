@@ -1,8 +1,8 @@
 [package]
-name = "aragons-comics"
+name = "aragon-comics"
 version = "0.1.0"
 description = "Comic upload & management site."
-repository = "https://github.com/SilkRose/Aragons-Comics"
+repository = "https://github.com/SilkRose/Aragon-Comics"
 authors = ["Silk Rose", "Meadowsys"]
 edition = "2024"
 license = "MIT"

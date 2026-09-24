@@ -132,13 +132,10 @@ fn session_table_row(session: &Session, num: usize) -> PreEscaped<String> {
 pub fn home_html(user: Option<User>) -> String {
 	let heading = "Home";
 	let title: String = format!("{heading} - {SITE_NAME}");
-	let description = "The Equestrian Census, reimagined.";
+	let description = "Nothing to see here…";
 	let mane = html! {
-		h1 { "Census Consensus" }
+		h1 { "Aragón Comics" }
 		p { (description) }
-		p {
-			""
-		}
 	};
 	html_builder()
 		.head(head_html(&title, description, SITE_LINK))
@@ -168,7 +165,7 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 			crossorigin
 			rel = "alternate"
 			type = "application/json+oembed"
-			href = { "https://census.silkrose.dev/oembed?" (encode) }
+			href = { "/oembed?" (encode) }
 			title = (title);
 		script crossorigin src = "/mane.js" {}
 
