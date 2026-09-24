@@ -44,6 +44,12 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 	html!(
 		h2 { "Authorized Users" }
 		p { "Update, remove, & add users." }
+		p {
+			"Authorized users can create, manage, and upload comics, so be \
+			careful who you give access to this site. Once someone is added \
+			to the list below they can login at "
+			a href = "/login/fimfic" { "this" sup { "↗" } } " link."
+		}
 		h3 { "User List:" }
 		p { "Click the buttons below to update or remove a user." }
 		@for user in users {
