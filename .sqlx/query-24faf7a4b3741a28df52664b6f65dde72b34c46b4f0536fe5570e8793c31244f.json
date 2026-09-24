@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT token, user_id, user_agent, last_seen, date_created\n\t\t\tFROM Tokens WHERE token = $1;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "token",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "tokens",
+            "name": "token"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "tokens",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "user_agent",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "tokens",
+            "name": "user_agent"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "last_seen",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "tokens",
+            "name": "last_seen"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "date_created",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "tokens",
+            "name": "date_created"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "24faf7a4b3741a28df52664b6f65dde72b34c46b4f0536fe5570e8793c31244f"
+}

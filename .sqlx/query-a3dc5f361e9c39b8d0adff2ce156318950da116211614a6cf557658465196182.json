@@ -1,0 +1,54 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO Users\n\t\t\t\t(id, name, pfp_url)\n\t\t\tVALUES\n\t\t\t\t($1, $2, $3)\n\t\t\tON CONFLICT(id) DO UPDATE SET\n\t\t\t\tname = EXCLUDED.name,\n\t\t\t\tpfp_url = EXCLUDED.pfp_url\n\t\t\tRETURNING\n\t\t\t\tid, name, pfp_url;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "pfp_url",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "pfp_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "a3dc5f361e9c39b8d0adff2ce156318950da116211614a6cf557658465196182"
+}
