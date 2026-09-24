@@ -6,14 +6,14 @@ services:
       dockerfile: Dockerfile
     environment:
       # The database URL for use in containers
-      DATABASE_URL: postgres://${POSTGRES_USER:-db}:${POSTGRES_PASSWORD:-pass}@postgres:5432/${POSTGRES_DB:-fixfiction}
+      DATABASE_URL: postgres://${POSTGRES_USER:-db}:${POSTGRES_PASSWORD:-pass}@postgres:5432/${POSTGRES_DB:-comics}
     volumes:
       # The .env file at project root
       - ./.env:/app/.env:ro
       # Persist application logs out-of-container
-      - ${FIXFICTION_LOGS_DIR:-./logs}:/app/logs
+      - ${LOGS_DIR:-./logs}:/app/logs
     ports:
-      - "7669:7669"
+      - "4663:4663"
     restart: unless-stopped
     depends_on:
       postgres:
@@ -28,16 +28,16 @@ services:
       dockerfile: Dockerfile.prebuilt
     environment:
       # The database URL for use in containers
-      DATABASE_URL: postgres://${POSTGRES_USER:-db}:${POSTGRES_PASSWORD:-pass}@postgres:5432/${POSTGRES_DB:-fixfiction}
+      DATABASE_URL: postgres://${POSTGRES_USER:-db}:${POSTGRES_PASSWORD:-pass}@postgres:5432/${POSTGRES_DB:-comics}
     volumes:
       # The .env file at project root
       - ./.env:/app/.env:ro
       # Persist application logs out-of-container
-      - ${FIXFICTION_LOGS_DIR:-./logs}:/app/logs
+      - ${LOGS_DIR:-./logs}:/app/logs
       # Assumed location of the application binary
-      - ./target/release/fixfiction:/usr/local/bin/fixfiction:ro
+      - ./target/release/aragon-comics:/usr/local/bin/aragon-comics:ro
     ports:
-      - "7669:7669"
+      - "4663:4663"
     restart: unless-stopped
     depends_on:
       postgres:
@@ -49,7 +49,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-db}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pass}
-      POSTGRES_DB: ${POSTGRES_DB:-fixfiction}
+      POSTGRES_DB: ${POSTGRES_DB:-comics}
     volumes:
       # Persist PostgreSQL data in a host bind mount
       - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data

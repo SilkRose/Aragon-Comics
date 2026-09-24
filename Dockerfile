@@ -1,6 +1,6 @@
 # This image builds its own application binary from source code.
 
-FROM rust:1.96-slim-bookworm AS builder
+FROM rustlang/rust:nightly AS builder
 # From here, build the binary
 
 WORKDIR /app
@@ -39,12 +39,12 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY --from=builder /app/target/release/fixfiction /usr/local/bin/fixfiction
+COPY --from=builder /app/target/release/aragon-comics /usr/local/bin/aragon-comics
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 7669
+EXPOSE 4663
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["/usr/local/bin/fixfiction"]
+CMD ["/usr/local/bin/aragon-comics"]

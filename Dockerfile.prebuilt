@@ -18,7 +18,7 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 7669
+EXPOSE 4663
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["/usr/local/bin/fixfiction"]
+CMD ["/usr/local/bin/aragon-comics"]
