@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS Users (
-	id               integer     NOT NULL PRIMARY KEY,
-	name             text        NOT NULL,
-	pfp_url          text        NULL
+	id      integer NOT NULL PRIMARY KEY,
+	name    text    NOT NULL,
+	pfp_url text    NULL
 );
 
 CREATE TABLE IF NOT EXISTS Tokens (
