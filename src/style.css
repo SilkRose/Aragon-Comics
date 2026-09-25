@@ -431,6 +431,22 @@
 		align-items: center;
 	}
 
+	td {
+		text-wrap: balance;
+		max-width: 50ch;
+	}
+
+	th,
+	td {
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	.date,
+	.time {
+		display: block;
+	}
+
 	.column {
 		display: flex;
 		flex-direction: column;
@@ -493,6 +509,15 @@
 		td {
 			display: block;
 			padding: 0.5rem 1rem;
+		}
+
+		.date,
+		.time {
+			display: inline;
+		}
+
+		.time::before {
+			content: " ";
 		}
 
 		td:first-child {

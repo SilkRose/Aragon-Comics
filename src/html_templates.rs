@@ -129,8 +129,16 @@ fn session_table_row(session: &Session, num: usize) -> PreEscaped<String> {
 			} @else {
 				td role = "cell" data-cell = "User Agent: " { (session.user_agent) }
 			}
-			td role = "cell" data-cell = "Created: " { (session.date_created.format("%y-%m-%d %H:%M")) }
-			td role = "cell" data-cell = "Last Seen: " { (session.last_seen.format("%y-%m-%d %H:%M")) }
+			td role = "cell" data-cell = "Created: "
+			{
+				span class = "date" { (session.date_created.format("%y-%m-%d")) }
+				span class = "time" { (session.date_created.format("%H:%M")) }
+			}
+			td role = "cell" data-cell = "Last Seen: "
+			{
+				span class = "date" { (session.last_seen.format("%y-%m-%d")) }
+				span class = "time" { (session.last_seen.format("%H:%M")) }
+			}
 		}
 	)
 }
