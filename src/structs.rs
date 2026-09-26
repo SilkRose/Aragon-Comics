@@ -60,3 +60,11 @@ pub struct Panel {
 	pub date_modified: DateTime<Utc>,
 	pub date_created: DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct ComicPanelData {
+	pub panel_count: usize,
+	pub bytes_original: i32,
+	pub bytes_compressed: i32,
+	pub latest_date: Option<DateTime<Utc>>,
+}

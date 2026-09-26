@@ -187,3 +187,46 @@ async fn oembed(query: Query<OEmbed>) -> Result<impl Responder> {
 		.content_type("application/json+oembed")
 		.json(embed))
 }
+
+#[post("/comics")]
+pub async fn set_new_comic(
+	body: String, mut db: ThinData<Db>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let title = body.trim_start_matches("title=");
+	println!("{title}");
+	// finish this later
+	Ok(HttpResponse::SeeOther()
+		.append_header(("Location", "/"))
+		.finish())
+}
+
+#[get("/comics")]
+pub async fn get_comics(mut db: ThinData<Db>, _: SessionInfo) -> Result<impl Responder> {
+	let comics = db.get_all_comics().await?;
+	let mut comic_data = Vec::with_capacity(comics.len());
+	for comic in comics {
+		let panels = db.get_all_panels_by_comic(comic.id).await?;
+		let panel_count = panels.len();
+		let bytes_original = panels
+			.iter()
+			.fold(0, |acc, panel| acc + panel.bytes_original);
+		let bytes_compressed = panels
+			.iter()
+			.fold(0, |acc, panel| acc + panel.bytes_compressed);
+		let latest_date = panels
+			.iter()
+			.max_by_key(|panel| panel.date_modified)
+			.map(|panel| panel.date_modified);
+		let panel = ComicPanelData {
+			panel_count,
+			bytes_original,
+			bytes_compressed,
+			latest_date,
+		};
+		comic_data.push((comic, panel));
+	}
+	let page = comic_html(comic_data);
+	Ok(HttpResponse::Ok()
+		.content_type("text/html; charset=utf-8")
+		.body(page))
+}

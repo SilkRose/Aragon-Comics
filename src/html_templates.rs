@@ -158,6 +158,32 @@ pub fn home_html(user: Option<User>) -> String {
 		.call()
 }
 
+pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
+	let heading = "Comics";
+	let title: String = format!("{heading} - {SITE_NAME}");
+	let description = "Comic list and new comic form.";
+	let link = format!("{SITE_LINK}/comics");
+	let mane = html! {
+		h1 { (heading) }
+		p { (description) }
+		h2 { "New Comic" }
+		form class = "row" method = "post" action = "/comics" {
+			label for = "title" { "Comic Title:" }
+			(input_text_required("title", "title", 1, 256))
+			button type = "submit" { "Create" }
+		}
+		h2 { "Comic List" }
+		@for (comic, panel_data) in comics {
+			// finish this later
+		}
+	};
+	html_builder()
+		.head(head_html(&title, description, &link))
+		.header(header_html(Pages::Comics, true))
+		.mane(mane)
+		.call()
+}
+
 // HTML components go below this comment:
 
 pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<String> {

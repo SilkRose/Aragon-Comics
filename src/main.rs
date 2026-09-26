@@ -110,6 +110,8 @@ async fn main() -> Result<()> {
 			.service(set_update_user)
 			.service(set_add_user)
 			.service(get_user)
+			.service(get_comics)
+			.service(set_new_comic)
 			.service(auth::dev_session)
 			.service(Files::new("/assets", "./assets"))
 			.app_data(db.clone())
