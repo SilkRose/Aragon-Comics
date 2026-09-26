@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE Comics SET page_hits = page_hits + 1\n\t\t\tWHERE url_stub = $1\n\t\t\tRETURNING\n\t\t\t\tid, title, url_stub, page_hits, date_modified, date_created;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "title"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "url_stub",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "url_stub"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "page_hits",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "page_hits"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "date_modified",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "date_modified"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "date_created",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "comics",
+            "name": "date_created"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "61a385187776e1395e042011449b0ad976e496a433ed66e94189c2c4b860b364"
+}
