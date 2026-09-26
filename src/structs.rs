@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize, Eq, Hash, PartialEq)]
@@ -44,7 +45,18 @@ pub struct Comic {
 	pub id: i32,
 	pub title: String,
 	pub url_stub: String,
-	pub page_hits: i128,
+	pub page_hits: i64,
+	pub date_modified: DateTime<Utc>,
+	pub date_created: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Panel {
+	pub comic_id: i32,
+	pub panel_number: Decimal,
+	pub panel_revision: i32,
+	pub bytes_original: i32,
+	pub bytes_compressed: i32,
 	pub date_modified: DateTime<Utc>,
 	pub date_created: DateTime<Utc>,
 }

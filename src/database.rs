@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::structs::*;
 use pony::fimfiction_api::user::UserData;
+use rust_decimal::Decimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 
@@ -336,5 +337,106 @@ pub trait DbExecutor {
 			.await
 			.map_err(delete_err)?
 			.rows_affected())
+	}
+
+	async fn insert_panel(
+		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+	) -> Result<Panel> {
+		Ok(sqlx::query_as!(
+			Panel,
+			"INSERT INTO Panels
+				(comic_id, panel_number, bytes_original, bytes_compressed)
+			VALUES
+				($1, $2, $3, $4)
+			RETURNING
+				comic_id, panel_number, panel_revision, bytes_original,
+				bytes_compressed, date_modified, date_created;",
+			comic_id,
+			panel_number,
+			bytes_original,
+			bytes_compressed
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(insert_err)?)
+	}
+
+	async fn get_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<Panel> {
+		Ok(sqlx::query_as!(
+			Panel,
+			"SELECT
+				comic_id, panel_number, panel_revision, bytes_original,
+				bytes_compressed, date_modified, date_created
+			FROM Panels
+			WHERE
+				comic_id = $1
+			AND
+				panel_number = $2;",
+			comic_id,
+			panel_number
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(delete_err)?)
+	}
+
+	async fn get_all_panels_by_comic(&mut self, comic_id: i32) -> Result<Vec<Panel>> {
+		Ok(sqlx::query_as!(
+			Panel,
+			"SELECT
+				comic_id, panel_number, panel_revision, bytes_original,
+				bytes_compressed, date_modified, date_created
+			FROM Panels
+			WHERE comic_id = $1
+			ORDER BY panel_number ASC;",
+			comic_id
+		)
+		.fetch_all(self.executor())
+		.await
+		.map_err(select_err)?)
+	}
+
+	async fn update_panel_revision(
+		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+	) -> Result<Panel> {
+		Ok(sqlx::query_as!(
+			Panel,
+			"UPDATE Panels
+			SET
+				panel_revision = panel_revision + 1,
+				bytes_original = $3,
+				bytes_compressed = $4,
+				date_modified = now()
+			WHERE
+				comic_id = $1
+			AND
+				panel_number = $2
+			RETURNING
+				comic_id, panel_number, panel_revision, bytes_original,
+				bytes_compressed, date_modified, date_created;",
+			comic_id,
+			panel_number,
+			bytes_original,
+			bytes_compressed
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(update_err)?)
+	}
+
+	async fn delete_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<u64> {
+		Ok(sqlx::query!(
+			"DELETE FROM Panels
+			WHERE
+				comic_id = $1
+			AND
+				panel_number = $2;",
+			comic_id,
+			panel_number
+		)
+		.execute(self.executor())
+		.await
+		.map_err(delete_err)?
+		.rows_affected())
 	}
 }

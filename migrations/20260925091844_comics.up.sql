@@ -8,20 +8,16 @@ CREATE TABLE IF NOT EXISTS Comics (
 );
 
 CREATE TABLE IF NOT EXISTS Panels (
-	comic_id         integer     NOT NULL,
-	panel_number     integer     NOT NULL,
-	panel_mantissa   integer     NOT NULL,
-	panel_revision   integer     NOT NULL,
-	bytes_original   integer     NOT NULL,
-	bytes_compressed integer     NOT NULL,
-	date_modified    timestamptz NOT NULL DEFAULT now(),
-	date_created     timestamptz NOT NULL DEFAULT now(),
+	comic_id         integer         NOT NULL,
+	panel_number     decimal(10, 10) NOT NULL,
+	panel_revision   integer         NOT NULL DEFAULT 0,
+	bytes_original   integer         NOT NULL,
+	bytes_compressed integer         NOT NULL,
+	date_modified    timestamptz     NOT NULL DEFAULT now(),
+	date_created     timestamptz     NOT NULL DEFAULT now(),
 
 	CONSTRAINT Comic_panel_fk FOREIGN KEY (comic_id)
 		REFERENCES Comics (id) ON DELETE CASCADE,
-
-	CONSTRAINT Panels_mantissa_ck
-		CHECK (panel_mantissa >= 0),
 
 	CONSTRAINT Panels_bytes_original_ck
 		CHECK (bytes_original > 0),
@@ -29,5 +25,5 @@ CREATE TABLE IF NOT EXISTS Panels (
 	CONSTRAINT Panels_bytes_compressed_ck
 		CHECK (bytes_compressed > 0),
 
-	CONSTRAINT Panels_pk PRIMARY KEY (comic_id, panel_number, panel_mantissa)
+	CONSTRAINT Panels_pk PRIMARY KEY (comic_id, panel_number)
 );
