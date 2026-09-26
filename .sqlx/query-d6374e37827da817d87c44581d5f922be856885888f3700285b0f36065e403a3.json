@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY panel_number ASC;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "comic_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "comic_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "panel_number",
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "panel_number"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "panel_revision",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "panel_revision"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "bytes_original",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "bytes_original"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "bytes_compressed",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "bytes_compressed"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "date_modified",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "date_modified"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "date_created",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "date_created"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "d6374e37827da817d87c44581d5f922be856885888f3700285b0f36065e403a3"
+}

@@ -1,0 +1,103 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO Panels\n\t\t\t\t(comic_id, panel_number, bytes_original, bytes_compressed)\n\t\t\tVALUES\n\t\t\t\t($1, $2, $3, $4)\n\t\t\tRETURNING\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "comic_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "comic_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "panel_number",
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "panel_number"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "panel_revision",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "panel_revision"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "bytes_original",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "bytes_original"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "bytes_compressed",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "bytes_compressed"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "date_modified",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "date_modified"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "date_created",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "date_created"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Numeric",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1e434d7d46f31cc29eb955c1a7280d9090b4724b52292d1a79cfde746edbbc2f"
+}

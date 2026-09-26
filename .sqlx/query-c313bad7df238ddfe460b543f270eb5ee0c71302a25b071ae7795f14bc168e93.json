@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM Panels\n\t\t\tWHERE\n\t\t\t\tcomic_id = $1\n\t\t\tAND\n\t\t\t\tpanel_number = $2;",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Numeric"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c313bad7df238ddfe460b543f270eb5ee0c71302a25b071ae7795f14bc168e93"
+}
