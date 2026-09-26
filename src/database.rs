@@ -235,4 +235,106 @@ pub trait DbExecutor {
 				.rows_affected(),
 		)
 	}
+
+	async fn insert_comic(&mut self, title: &str, url_stub: &str) -> Result<Comic> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"INSERT INTO Comics
+				(title, url_stub)
+			VALUES
+				($1, $2)
+			RETURNING
+				id, title, url_stub, page_hits, date_modified, date_created;",
+			title,
+			url_stub
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(insert_err)?)
+	}
+
+	async fn get_comic_by_id(&mut self, id: i32) -> Result<Comic> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"SELECT
+				id, title, url_stub, page_hits, date_modified, date_created
+			FROM Comics
+			WHERE id = $1;",
+			id
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(insert_err)?)
+	}
+
+	async fn get_comic_by_url(&mut self, url_stub: &str) -> Result<Comic> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"SELECT
+				id, title, url_stub, page_hits, date_modified, date_created
+			FROM Comics
+			WHERE url_stub = $1;",
+			url_stub
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(insert_err)?)
+	}
+
+	async fn get_comic_by_url_count_hit(&mut self, url_stub: &str) -> Result<Comic> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"UPDATE Comics SET page_hits = page_hits + 1
+			WHERE url_stub = $1
+			RETURNING
+				id, title, url_stub, page_hits, date_modified, date_created;",
+			url_stub
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(select_err)?)
+	}
+
+	async fn get_all_comics(&mut self) -> Result<Vec<Comic>> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"SELECT
+				id, title, url_stub, page_hits, date_modified, date_created
+			FROM Comics
+			ORDER BY date_created DESC;",
+		)
+		.fetch_all(self.executor())
+		.await
+		.map_err(select_err)?)
+	}
+
+	async fn update_comic_title(
+		&mut self, old_stub: &str, new_stub: &str, new_title: &str,
+	) -> Result<Comic> {
+		Ok(sqlx::query_as!(
+			Comic,
+			"UPDATE Comics
+			SET
+				url_stub = $2,
+				title = $3,
+				date_modified = now()
+			WHERE url_stub = $1
+			RETURNING
+				id, title, url_stub, page_hits, date_modified, date_created;",
+			old_stub,
+			new_stub,
+			new_title
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(update_err)?)
+	}
+
+	async fn delete_comic(&mut self, id: i32) -> Result<u64> {
+		Ok(sqlx::query!("DELETE FROM Comics WHERE id = $1;", id)
+			.execute(self.executor())
+			.await
+			.map_err(delete_err)?
+			.rows_affected())
+	}
 }

@@ -38,3 +38,13 @@ pub struct OEmbed {
 	pub cache_age: u32,
 	pub html: String,
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Comic {
+	pub id: i32,
+	pub title: String,
+	pub url_stub: String,
+	pub page_hits: i128,
+	pub date_modified: DateTime<Utc>,
+	pub date_created: DateTime<Utc>,
+}
