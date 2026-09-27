@@ -188,15 +188,23 @@ async fn oembed(query: Query<OEmbed>) -> Result<impl Responder> {
 		.json(embed))
 }
 
-#[post("/comics")]
+#[get("/comics/new")]
 pub async fn set_new_comic(
-	body: String, mut db: ThinData<Db>, _: SessionInfo,
+	queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
 ) -> Result<impl Responder> {
-	let title = body.trim_start_matches("title=");
-	println!("{title}");
-	// finish this later
+	let Some(title) = queries.into_inner().get("title").cloned() else {
+		let msg = "Missing title parameter.";
+		return Ok(HttpResponse::BadRequest().body(msg));
+	};
+	let url_stub = title
+		.chars()
+		.filter(|c| c.is_ascii_alphanumeric() || *c == ' ')
+		.map(|c| c.to_ascii_lowercase())
+		.collect::<String>()
+		.replace(' ', "-");
+	db.insert_comic(&title, &url_stub).await?;
 	Ok(HttpResponse::SeeOther()
-		.append_header(("Location", "/"))
+		.append_header(("Location", format!("/{url_stub}")))
 		.finish())
 }
 

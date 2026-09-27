@@ -167,7 +167,7 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 		h1 { (heading) }
 		p { (description) }
 		h2 { "New Comic" }
-		form class = "row" method = "post" action = "/comics" {
+		form class = "row" method = "get" action = "/comics/new" {
 			label for = "title" { "Comic Title:" }
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Create" }
