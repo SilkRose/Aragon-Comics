@@ -200,8 +200,8 @@ pub async fn set_new_comic(
 		.chars()
 		.filter(|c| c.is_ascii_alphanumeric() || *c == ' ')
 		.map(|c| c.to_ascii_lowercase())
-		.collect::<String>()
-		.replace(' ', "-");
+		.map(|c| if c == ' ' { '-' } else { c })
+		.collect::<String>();
 	db.insert_comic(&title, &url_stub).await?;
 	Ok(HttpResponse::SeeOther()
 		.append_header(("Location", format!("/{url_stub}")))
