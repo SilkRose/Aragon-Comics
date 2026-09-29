@@ -204,7 +204,7 @@ pub async fn set_new_comic(
 		.collect::<String>();
 	db.insert_comic(&title, &url_stub).await?;
 	Ok(HttpResponse::SeeOther()
-		.append_header(("Location", format!("/{url_stub}")))
+		.append_header(("Location", format!("/comic/manage/{url_stub}")))
 		.finish())
 }
 

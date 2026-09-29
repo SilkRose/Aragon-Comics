@@ -2,6 +2,8 @@ use crate::structs::*;
 use crate::{SITE_LINK, SITE_NAME};
 use bon::builder;
 use maud::{DOCTYPE, PreEscaped, html};
+use pony::bytes::FormatType::Abbreviation;
+use pony::bytes::format_size_bytes;
 use url::form_urlencoded;
 
 #[builder]
@@ -174,7 +176,31 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 		}
 		h2 { "Comic List" }
 		@for (comic, panel_data) in comics {
-			// finish this later
+			span class = "list-item" {
+				h3 { a href = (format!("/comics/{}", comic.url_stub)) { (comic.title) sup { "↗" } } }
+				p {
+					b { "Panels: " }
+					(panel_data.panel_count)
+					b { " Bytes Original/Compressed: " }
+					(&format_size_bytes(panel_data.bytes_original as f64, Abbreviation).unwrap())
+					"/"
+					(&format_size_bytes(panel_data.bytes_compressed as f64, Abbreviation).unwrap())
+					b { " Page Hits: " }
+					(comic.page_hits)
+					" "
+					a href = (format!("/comics/manage/{}", comic.url_stub)) { "Manage" sup { "↗" } }
+				}
+				p {
+					b { "Created: " }
+					(comic.date_created.format("%y-%m-%d %H:%M"))
+					b { " Last Edit: " }
+					(comic.date_modified.format("%y-%m-%d %H:%M"))
+					@if let Some(date) = panel_data.latest_date {
+						b { " Last Panel Edit: " }
+						(date.format("%y-%m-%d %H:%M"))
+					}
+				}
+			}
 		}
 	};
 	html_builder()

@@ -162,9 +162,9 @@
 
 		/* extra colors */
 		--input-background: hsl(244, 25%, 16%);
-		--table-border: hsl(244, 25%, 21%);
-		--table-row-1: hsl(244, 25%, 11%);
-		--table-row-2: hsl(244, 25%, 16%);
+		--table-border: hsl(244, 25%, 20%);
+		--table-row-1: hsl(244, 25%, 14%);
+		--table-row-2: hsl(244, 25%, 17%);
 	}
 
 	dialog,
@@ -274,21 +274,21 @@
 		}
 	}
 
-	hr:nth-of-type(4n + 1) {
+	hr:nth-of-type(2n + 1) {
 		background-color: var(--accent);
 	}
 
-	hr:nth-of-type(4n + 2) {
+	hr:nth-of-type(2n + 2) {
 		background-color: var(--secondary);
 	}
 
-	.list-item:nth-of-type(4n + 1),
-	tr:nth-child(4n + 1) {
+	.list-item:nth-of-type(2n + 1),
+	tr:nth-child(2n + 1) {
 		background-color: var(--table-row-1);
 	}
 
-	.list-item:nth-of-type(4n + 2),
-	tr:nth-child(4n + 2) {
+	.list-item:nth-of-type(2n + 2),
+	tr:nth-child(2n + 2) {
 		background-color: var(--table-row-2);
 	}
 }
