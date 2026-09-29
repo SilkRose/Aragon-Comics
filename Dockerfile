@@ -24,7 +24,7 @@ COPY src ./src
 
 RUN cargo build --release --locked
 
-FROM debian:bookworm-slim AS runtime
+FROM debian:trixie-slim AS runtime
 # From here, run the binary
 
 RUN apt-get update \
