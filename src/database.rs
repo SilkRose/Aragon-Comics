@@ -310,7 +310,7 @@ pub trait DbExecutor {
 	}
 
 	async fn update_comic_title(
-		&mut self, old_stub: &str, new_stub: &str, new_title: &str,
+		&mut self, id: i32, new_stub: &str, new_title: &str,
 	) -> Result<Comic> {
 		Ok(sqlx::query_as!(
 			Comic,
@@ -319,10 +319,10 @@ pub trait DbExecutor {
 				url_stub = $2,
 				title = $3,
 				date_modified = now()
-			WHERE url_stub = $1
+			WHERE id = $1
 			RETURNING
 				id, title, url_stub, page_hits, date_modified, date_created;",
-			old_stub,
+			id,
 			new_stub,
 			new_title
 		)

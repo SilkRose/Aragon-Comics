@@ -238,3 +238,38 @@ pub async fn get_comics(mut db: ThinData<Db>, _: SessionInfo) -> Result<impl Res
 		.content_type("text/html; charset=utf-8")
 		.body(page))
 }
+
+#[get("/comics/rename/{id}")]
+pub async fn set_rename_comic(
+	path: Path<i32>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let id = path.into_inner();
+	let Some(title) = queries.into_inner().get("title").cloned() else {
+		let msg = "Missing title parameter.";
+		return Ok(HttpResponse::BadRequest().body(msg));
+	};
+	let url_stub = title
+		.chars()
+		.filter(|c| c.is_ascii_alphanumeric() || *c == ' ')
+		.map(|c| c.to_ascii_lowercase())
+		.map(|c| if c == ' ' { '-' } else { c })
+		.collect::<String>();
+	let comic = db.get_comic_by_id(id).await?;
+	db.update_comic_title(id, &url_stub, &title).await?;
+	Ok(HttpResponse::SeeOther()
+		.append_header(("Location", format!("/comics/manage/{url_stub}")))
+		.finish())
+}
+
+#[get("/comics/manage/{id}")]
+pub async fn get_manage_comic(
+	path: Path<String>, mut db: ThinData<Db>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let url_stub = path.into_inner();
+	let comic = db.get_comic_by_url(&url_stub).await?;
+	let panels = db.get_all_panels_by_comic(comic.id).await?;
+	let page = manage_comic_html(comic, panels);
+	Ok(HttpResponse::Ok()
+		.content_type("text/html; charset=utf-8")
+		.body(page))
+}

@@ -170,7 +170,7 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 		p { (description) }
 		h2 { "New Comic" }
 		form class = "row" method = "get" action = "/comics/new" {
-			label for = "title" { "Comic Title:" }
+			label for = "title" { "Title:" }
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Create" }
 		}
@@ -201,6 +201,28 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 					}
 				}
 			}
+		}
+	};
+	html_builder()
+		.head(head_html(&title, description, &link))
+		.header(header_html(Pages::Comics, true))
+		.mane(mane)
+		.call()
+}
+
+pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
+	let heading = format!("{} - Manage", comic.title);
+	let title: String = format!("{heading} - {SITE_NAME}");
+	let description = "Comic renaming and panel management.";
+	let link = format!("{SITE_LINK}/comics/manage/{}", comic.url_stub);
+	let mane = html! {
+		h1 { (heading) }
+		p { (description) }
+		h2 { "Rename Comic" }
+		form class = "row" method = "get" action = (format!("/comics/rename/{}", comic.id)) {
+			label for = "title" { "Title:" }
+			(input_text_required("title", "title", 1, 256))
+			button type = "submit" { "Rename" }
 		}
 	};
 	html_builder()
