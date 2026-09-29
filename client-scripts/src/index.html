@@ -1,0 +1,20 @@
+<link
+	data-trunk
+	rel="rust"
+	href=".."
+	data-bin="mane"
+	data-cargo-profile-release="release-wasm"
+	data-type="main"
+	data-wasm-opt="z"
+	data-wasm-opt-params="--enable-bulk-memory"
+>
+<link
+	data-trunk
+	rel="rust"
+	href=".."
+	data-bin="worker"
+	data-cargo-profile-release="release-wasm"
+	data-type="worker"
+	data-wasm-opt="z"
+	data-wasm-opt-params="--enable-bulk-memory"
+>

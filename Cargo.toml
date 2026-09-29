@@ -43,7 +43,7 @@ url = "2.5.8"
 [workspace]
 resolver = "3"
 members = [
-	"worker"
+	"client-scripts"
 ]
 
 [profile.dev]
