@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE Comics\n\t\t\tSET\n\t\t\t\turl_stub = $2,\n\t\t\t\ttitle = $3,\n\t\t\t\tdate_modified = now()\n\t\t\tWHERE url_stub = $1\n\t\t\tRETURNING\n\t\t\t\tid, title, url_stub, page_hits, date_modified, date_created;",
+  "query": "UPDATE Comics\n\t\t\tSET\n\t\t\t\turl_stub = $2,\n\t\t\t\ttitle = $3,\n\t\t\t\tdate_modified = now()\n\t\t\tWHERE id = $1\n\t\t\tRETURNING\n\t\t\t\tid, title, url_stub, page_hits, date_modified, date_created;",
   "describe": {
     "columns": [
       {
@@ -72,7 +72,7 @@
     ],
     "parameters": {
       "Left": [
-        "Text",
+        "Int4",
         "Text",
         "Text"
       ]
@@ -86,5 +86,5 @@
       false
     ]
   },
-  "hash": "cf7ecc2eb52b8a9313820fb330bff10116ed8306c7582a4bb42dbc2bf8492893"
+  "hash": "ff90107a099b934ae0fa2ae5273c77ffdb29c4c14f9db3f1ba4eff3306b9dd15"
 }
