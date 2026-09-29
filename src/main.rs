@@ -11,6 +11,8 @@ pub use actix_files::Files;
 pub use actix_web::middleware::Compress;
 pub use actix_web::web::ThinData as Data;
 pub use actix_web::{App as ActixApp, HttpServer};
+pub use aws_sdk_s3::config::{Credentials, Region};
+pub use aws_sdk_s3::{Client, Config};
 
 mod auth;
 mod database;
@@ -73,6 +75,27 @@ async fn main() -> Result<()> {
 		}
 	};
 
+	let credentials = Credentials::new(
+		env_vars::bucket_access_key_id(),
+		env_vars::bucket_secret_access_key(),
+		None,
+		None,
+		"r2",
+	);
+
+	let s3config = Config::builder()
+		.behavior_version_latest()
+		.region(Region::new("auto"))
+		.credentials_provider(credentials)
+		.endpoint_url(format!(
+			"https://{}.us.r2.cloudflarestorage.com",
+			env_vars::cloudflare_account_id()
+		))
+		.build();
+
+	let s3client = Client::from_conf(s3config);
+	let s3client = Data(s3client);
+
 	let create_dev_session = env_vars::create_dev_session().is_some();
 	let token = rand::gen_auth_token();
 
@@ -119,6 +142,7 @@ async fn main() -> Result<()> {
 			.app_data(db.clone())
 			.app_data(fimfic.clone())
 			.app_data(http_client.clone())
+			.app_data(s3client.clone())
 			.app_data(dev_session.clone())
 			.wrap(Compress::default())
 	});

@@ -82,4 +82,13 @@ declare_env_fn! {
 	///
 	/// This should not be set in production environments for security reasons
 	(optional) create_dev_session() -> "CREATE_DEV_SESSION"
+
+	/// Cloudflare account ID
+	cloudflare_account_id() -> "CLOUDFLARE_ACCOUNT_ID"
+
+	/// R2 bucket access key ID
+	bucket_access_key_id() -> "BUCKET_ACCESS_KEY_ID"
+
+	/// R2 bucket secret access key
+	bucket_secret_access_key() -> "BUCKET_SECRET_ACCESS_KEY"
 }

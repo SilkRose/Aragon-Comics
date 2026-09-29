@@ -12,6 +12,7 @@ publish = false
 actix-files = { version = "0.7.0" }
 actix-web = { version = "4.15.0", features = ["macros"] }
 anyhow = { version = "1.0.104" }
+aws-sdk-s3 = { version = "1.150.0" }
 base64ct = { version = "1.8.3", features = ["std"] }
 bon = { version = "3.10.1" }
 chrono = { version = "0.4.45", features = ["serde"] }
