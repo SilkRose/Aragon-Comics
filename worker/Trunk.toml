@@ -1,0 +1,6 @@
+# trunk-version = "0.21.14"
+
+[build]
+target = "src/index.html"
+dist = "../target/worker"
+minify = "on_release"
