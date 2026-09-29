@@ -1,9 +1,7 @@
 function openDialog(id) {
-	let dialog = window.document.getElementById(id);
-	dialog.showModal();
+	window.document.getElementById(id).showModal();
 }
 
 function closeDialog(id) {
-	let dialog = window.document.getElementById(id);
-	dialog.close();
+	window.document.getElementById(id).close();
 }
