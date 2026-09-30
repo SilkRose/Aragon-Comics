@@ -7,8 +7,14 @@ use crate::utility::*;
 use crate::{FimficCfg, HttpClient};
 use actix_web::web::{Path, Query, ThinData};
 use actix_web::{HttpRequest, HttpResponse, Responder, get, post};
+use aws_sdk_s3::Client;
+use aws_sdk_s3::presigning::PresigningConfigBuilder;
+use chrono::Utc;
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
+use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
+use std::str::FromStr;
+use std::time::{Duration, SystemTime};
 use tokio::fs;
 
 #[cfg(not(debug_assertions))]
@@ -272,4 +278,31 @@ pub async fn get_manage_comic(
 	Ok(HttpResponse::Ok()
 		.content_type("text/html; charset=utf-8")
 		.body(page))
+}
+
+#[post("/comics/manage/{id}/panel")]
+pub async fn set_comic_panel(
+	path: Path<i32>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let id = path.into_inner();
+	let comic = db.get_comic_by_id(id).await?;
+	let data = serde_urlencoded::from_str::<PanelData>(&body)?;
+	let number = data.filename.to_ascii_lowercase();
+	let number = number.trim_end_matches(".png");
+	let number = Decimal::from_str(number)?;
+	let key = format!("{}/{}", comic.id, data.hash);
+	let config = PresigningConfigBuilder::default()
+		.start_time(SystemTime::from(Utc::now()))
+		.expires_in(Duration::from_mins(15))
+		.build()?;
+	let url = s3client
+		.put_object()
+		.bucket("pony-r2")
+		.content_encoding(String::from("image/png"))
+		.key(key)
+		.presigned(config)
+		.await?
+		.uri();
+	// Insert into DB then return URL here.
+	Ok(HttpResponse::Ok().finish())
 }
