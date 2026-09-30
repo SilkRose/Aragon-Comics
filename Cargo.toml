@@ -19,7 +19,7 @@ chrono = { version = "0.4.45", features = ["serde"] }
 dotenvy = { version = "0.15.7" }
 lightningcss = { version = "1.0.0-alpha.72" }
 maud = { version = "0.27.0" }
-oxipng = { version = "10.2.1", default-features = false, features = ["zopfli"] }
+# oxipng = { version = "10.2.1", default-features = false, features = ["zopfli"] }
 pony = { git = "https://github.com/SilkRose/Pony", rev = "03cf3b82e88ab86b69cdfd04361175238051463b" }
 rand = { version = "0.10.3", default-features = false, features = [
 	"chacha",
@@ -38,9 +38,12 @@ sqlx = { version = "0.9.0", default-features = false, features = [
 	"runtime-tokio",
 	"tls-rustls",
 	"rust_decimal",
+	"uuid",
 ] }
 tokio = { version = "1.53.1", default-features = false }
-url = "2.5.8"
+ulid = { version = "3.0.0", features = ["uuid"] }
+url = { version = "2.5.8" }
+uuid = { version = "1.26.1" }
 
 [profile.dev]
 opt-level = 0
