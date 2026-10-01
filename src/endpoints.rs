@@ -293,7 +293,7 @@ pub async fn set_comic_panel(
 	let number = data.filename.to_ascii_lowercase();
 	let number = number.trim_end_matches(".png");
 	let number = Decimal::from_str(number)?;
-	let key = format!("{}/{}", comic.id, data.hash);
+	let key = format!("{}/{number}-{}", comic.id, data.hash);
 	let config = PresigningConfigBuilder::default()
 		.start_time(SystemTime::from(Utc::now()))
 		.expires_in(Duration::from_mins(15))
@@ -304,8 +304,14 @@ pub async fn set_comic_panel(
 		.content_encoding(String::from("image/png"))
 		.key(key)
 		.presigned(config)
-		.await?
-		.uri();
-	// Insert into DB then return URL here.
-	Ok(HttpResponse::Ok().finish())
+		.await?;
+	db.insert_panel(
+		comic.id,
+		number,
+		&data.hash,
+		data.bytes_original,
+		data.bytes_compressed,
+	)
+	.await?;
+	Ok(HttpResponse::Ok().body(url.uri().to_string()))
 }

@@ -341,20 +341,22 @@ pub trait DbExecutor {
 	}
 
 	async fn insert_panel(
-		&mut self, comic_id: Uuid, panel_number: Decimal, bytes_original: i32,
-		bytes_compressed: i32,
+		&mut self, comic_id: Uuid, panel_number: Decimal, panel_sha256sum: &str,
+		bytes_original: i32, bytes_compressed: i32,
 	) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"INSERT INTO Panels
-				(comic_id, panel_number, bytes_original, bytes_compressed)
+				(comic_id, panel_number, panel_sha256sum,
+				bytes_original, bytes_compressed)
 			VALUES
-				($1, $2, $3, $4)
+				($1, $2, $3, $4, $5)
 			RETURNING
 				comic_id, panel_number, panel_sha256sum, bytes_original,
 				bytes_compressed, date_modified, date_created;",
 			comic_id,
 			panel_number,
+			panel_sha256sum,
 			bytes_original,
 			bytes_compressed
 		)
