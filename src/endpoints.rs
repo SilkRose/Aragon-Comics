@@ -16,7 +16,6 @@ use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 use tokio::fs;
-use uuid::Uuid;
 
 #[cfg(not(debug_assertions))]
 use actix_web::web::Bytes;
@@ -248,10 +247,9 @@ pub async fn get_comics(mut db: ThinData<Db>, _: SessionInfo) -> Result<impl Res
 
 #[get("/comics/rename/{id}")]
 pub async fn set_rename_comic(
-	path: Path<String>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>,
-	_: SessionInfo,
+	path: Path<i32>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
 ) -> Result<impl Responder> {
-	let id = Uuid::from_str(&path.into_inner())?;
+	let id = path.into_inner();
 	let Some(title) = queries.into_inner().get("title").cloned() else {
 		let msg = "Missing title parameter.";
 		return Ok(HttpResponse::BadRequest().body(msg));
@@ -284,16 +282,15 @@ pub async fn get_manage_comic(
 
 #[post("/comics/manage/{id}/panel")]
 pub async fn set_comic_panel(
-	path: Path<String>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>,
-	_: SessionInfo,
+	path: Path<i32>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
 ) -> Result<impl Responder> {
-	let id = Uuid::from_str(&path.into_inner())?;
+	let id = path.into_inner();
 	let comic = db.get_comic_by_id(id).await?;
 	let data = serde_json::from_str::<PanelData>(&body)?;
 	let number = data.filename.to_ascii_lowercase();
 	let number = number.trim_end_matches(".png");
 	let number = Decimal::from_str(number)?;
-	let key = format!("{}/{number}-{}", comic.id, data.hash);
+	let key = format!("{}/{number}-", comic.id);
 	let config = PresigningConfigBuilder::default()
 		.start_time(SystemTime::from(Utc::now()))
 		.expires_in(Duration::from_mins(15))
@@ -305,13 +302,7 @@ pub async fn set_comic_panel(
 		.key(key)
 		.presigned(config)
 		.await?;
-	db.insert_panel(
-		comic.id,
-		number,
-		&data.hash,
-		data.bytes_original,
-		data.bytes_compressed,
-	)
-	.await?;
+	db.insert_panel(comic.id, number, data.bytes_original, data.bytes_compressed)
+		.await?;
 	Ok(HttpResponse::Ok().body(url.uri().to_string()))
 }
