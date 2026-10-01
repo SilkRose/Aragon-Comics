@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Eq, Hash, PartialEq)]
 pub struct User {
@@ -40,9 +41,9 @@ pub struct OEmbed {
 	pub html: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Clone)]
 pub struct Comic {
-	pub id: i32,
+	pub id: Uuid,
 	pub title: String,
 	pub url_stub: String,
 	pub page_hits: i64,
@@ -50,11 +51,11 @@ pub struct Comic {
 	pub date_created: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Clone)]
 pub struct Panel {
-	pub comic_id: i32,
+	pub comic_id: Uuid,
 	pub panel_number: Decimal,
-	pub panel_revision: i32,
+	pub panel_sha256sum: String,
 	pub bytes_original: i32,
 	pub bytes_compressed: i32,
 	pub date_modified: DateTime<Utc>,

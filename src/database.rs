@@ -4,6 +4,7 @@ use pony::fimfiction_api::user::UserData;
 use rust_decimal::Decimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
+use uuid::Uuid;
 
 fn insert_err(err: sqlx::Error) -> String {
 	format!("database insertion error:\n{err}")
@@ -254,7 +255,7 @@ pub trait DbExecutor {
 		.map_err(insert_err)?)
 	}
 
-	async fn get_comic_by_id(&mut self, id: i32) -> Result<Comic> {
+	async fn get_comic_by_id(&mut self, id: Uuid) -> Result<Comic> {
 		Ok(sqlx::query_as!(
 			Comic,
 			"SELECT
@@ -310,7 +311,7 @@ pub trait DbExecutor {
 	}
 
 	async fn update_comic_title(
-		&mut self, id: i32, new_stub: &str, new_title: &str,
+		&mut self, id: Uuid, new_stub: &str, new_title: &str,
 	) -> Result<Comic> {
 		Ok(sqlx::query_as!(
 			Comic,
@@ -331,7 +332,7 @@ pub trait DbExecutor {
 		.map_err(update_err)?)
 	}
 
-	async fn delete_comic(&mut self, id: i32) -> Result<u64> {
+	async fn delete_comic(&mut self, id: Uuid) -> Result<u64> {
 		Ok(sqlx::query!("DELETE FROM Comics WHERE id = $1;", id)
 			.execute(self.executor())
 			.await
@@ -340,7 +341,8 @@ pub trait DbExecutor {
 	}
 
 	async fn insert_panel(
-		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+		&mut self, comic_id: Uuid, panel_number: Decimal, bytes_original: i32,
+		bytes_compressed: i32,
 	) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
@@ -349,7 +351,7 @@ pub trait DbExecutor {
 			VALUES
 				($1, $2, $3, $4)
 			RETURNING
-				comic_id, panel_number, panel_revision, bytes_original,
+				comic_id, panel_number, panel_sha256sum, bytes_original,
 				bytes_compressed, date_modified, date_created;",
 			comic_id,
 			panel_number,
@@ -361,11 +363,11 @@ pub trait DbExecutor {
 		.map_err(insert_err)?)
 	}
 
-	async fn get_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<Panel> {
+	async fn get_panel(&mut self, comic_id: Uuid, panel_number: Decimal) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, panel_number, panel_revision, bytes_original,
+				comic_id, panel_number, panel_sha256sum, bytes_original,
 				bytes_compressed, date_modified, date_created
 			FROM Panels
 			WHERE
@@ -380,11 +382,11 @@ pub trait DbExecutor {
 		.map_err(delete_err)?)
 	}
 
-	async fn get_all_panels_by_comic(&mut self, comic_id: i32) -> Result<Vec<Panel>> {
+	async fn get_all_panels_by_comic(&mut self, comic_id: Uuid) -> Result<Vec<Panel>> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, panel_number, panel_revision, bytes_original,
+				comic_id, panel_number, panel_sha256sum, bytes_original,
 				bytes_compressed, date_modified, date_created
 			FROM Panels
 			WHERE comic_id = $1
@@ -396,26 +398,28 @@ pub trait DbExecutor {
 		.map_err(select_err)?)
 	}
 
-	async fn update_panel_revision(
-		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+	async fn update_panel_hash(
+		&mut self, comic_id: Uuid, panel_number: Decimal, panel_sha256sum: &str,
+		bytes_original: i32, bytes_compressed: i32,
 	) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"UPDATE Panels
 			SET
-				panel_revision = panel_revision + 1,
-				bytes_original = $3,
-				bytes_compressed = $4,
+				panel_sha256sum = $3,
+				bytes_original = $4,
+				bytes_compressed = $5,
 				date_modified = now()
 			WHERE
 				comic_id = $1
 			AND
 				panel_number = $2
 			RETURNING
-				comic_id, panel_number, panel_revision, bytes_original,
+				comic_id, panel_number, panel_sha256sum, bytes_original,
 				bytes_compressed, date_modified, date_created;",
 			comic_id,
 			panel_number,
+			panel_sha256sum,
 			bytes_original,
 			bytes_compressed
 		)
@@ -424,7 +428,7 @@ pub trait DbExecutor {
 		.map_err(update_err)?)
 	}
 
-	async fn delete_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<u64> {
+	async fn delete_panel(&mut self, comic_id: Uuid, panel_number: Decimal) -> Result<u64> {
 		Ok(sqlx::query!(
 			"DELETE FROM Panels
 			WHERE

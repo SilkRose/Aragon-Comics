@@ -16,6 +16,7 @@ use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime};
 use tokio::fs;
+use uuid::Uuid;
 
 #[cfg(not(debug_assertions))]
 use actix_web::web::Bytes;
@@ -247,9 +248,10 @@ pub async fn get_comics(mut db: ThinData<Db>, _: SessionInfo) -> Result<impl Res
 
 #[get("/comics/rename/{id}")]
 pub async fn set_rename_comic(
-	path: Path<i32>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
+	path: Path<String>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>,
+	_: SessionInfo,
 ) -> Result<impl Responder> {
-	let id = path.into_inner();
+	let id = Uuid::from_str(&path.into_inner())?;
 	let Some(title) = queries.into_inner().get("title").cloned() else {
 		let msg = "Missing title parameter.";
 		return Ok(HttpResponse::BadRequest().body(msg));
@@ -282,9 +284,10 @@ pub async fn get_manage_comic(
 
 #[post("/comics/manage/{id}/panel")]
 pub async fn set_comic_panel(
-	path: Path<i32>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
+	path: Path<String>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>,
+	_: SessionInfo,
 ) -> Result<impl Responder> {
-	let id = path.into_inner();
+	let id = Uuid::from_str(&path.into_inner())?;
 	let comic = db.get_comic_by_id(id).await?;
 	let data = serde_urlencoded::from_str::<PanelData>(&body)?;
 	let number = data.filename.to_ascii_lowercase();
