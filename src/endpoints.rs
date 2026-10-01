@@ -289,7 +289,7 @@ pub async fn set_comic_panel(
 ) -> Result<impl Responder> {
 	let id = Uuid::from_str(&path.into_inner())?;
 	let comic = db.get_comic_by_id(id).await?;
-	let data = serde_urlencoded::from_str::<PanelData>(&body)?;
+	let data = serde_json::from_str::<PanelData>(&body)?;
 	let number = data.filename.to_ascii_lowercase();
 	let number = number.trim_end_matches(".png");
 	let number = Decimal::from_str(number)?;

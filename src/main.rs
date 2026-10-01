@@ -137,6 +137,7 @@ async fn main() -> Result<()> {
 			.service(get_manage_comic)
 			.service(set_new_comic)
 			.service(set_rename_comic)
+			.service(set_comic_panel)
 			.service(auth::dev_session)
 			.service(Files::new("/assets", "./assets"))
 			.app_data(db.clone())
