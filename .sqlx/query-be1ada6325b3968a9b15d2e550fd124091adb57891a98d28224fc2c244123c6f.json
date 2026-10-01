@@ -1,12 +1,12 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO Panels\n\t\t\t\t(comic_id, panel_number, bytes_original, bytes_compressed)\n\t\t\tVALUES\n\t\t\t\t($1, $2, $3, $4)\n\t\t\tRETURNING\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created;",
+  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_sha256sum, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE\n\t\t\t\tcomic_id = $1\n\t\t\tAND\n\t\t\t\tpanel_number = $2;",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
         "name": "comic_id",
-        "type_info": "Int4",
+        "type_info": "Uuid",
         "origin": {
           "Table": {
             "table": "panels",
@@ -27,12 +27,12 @@
       },
       {
         "ordinal": 2,
-        "name": "panel_revision",
-        "type_info": "Int4",
+        "name": "panel_sha256sum",
+        "type_info": "Bpchar",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_revision"
+            "name": "panel_sha256sum"
           }
         }
       },
@@ -83,10 +83,8 @@
     ],
     "parameters": {
       "Left": [
-        "Int4",
-        "Numeric",
-        "Int4",
-        "Int4"
+        "Uuid",
+        "Numeric"
       ]
     },
     "nullable": [
@@ -99,5 +97,5 @@
       false
     ]
   },
-  "hash": "1e434d7d46f31cc29eb955c1a7280d9090b4724b52292d1a79cfde746edbbc2f"
+  "hash": "be1ada6325b3968a9b15d2e550fd124091adb57891a98d28224fc2c244123c6f"
 }

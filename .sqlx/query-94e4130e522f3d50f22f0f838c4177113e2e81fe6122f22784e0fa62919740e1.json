@@ -1,12 +1,12 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY panel_number ASC;",
+  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_sha256sum, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY panel_number ASC;",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
         "name": "comic_id",
-        "type_info": "Int4",
+        "type_info": "Uuid",
         "origin": {
           "Table": {
             "table": "panels",
@@ -27,12 +27,12 @@
       },
       {
         "ordinal": 2,
-        "name": "panel_revision",
-        "type_info": "Int4",
+        "name": "panel_sha256sum",
+        "type_info": "Bpchar",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_revision"
+            "name": "panel_sha256sum"
           }
         }
       },
@@ -83,7 +83,7 @@
     ],
     "parameters": {
       "Left": [
-        "Int4"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -96,5 +96,5 @@
       false
     ]
   },
-  "hash": "d6374e37827da817d87c44581d5f922be856885888f3700285b0f36065e403a3"
+  "hash": "94e4130e522f3d50f22f0f838c4177113e2e81fe6122f22784e0fa62919740e1"
 }
