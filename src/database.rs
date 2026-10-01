@@ -4,6 +4,7 @@ use pony::fimfiction_api::user::UserData;
 use rust_decimal::Decimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
+use ulid::Ulid;
 use uuid::Uuid;
 
 fn insert_err(err: sqlx::Error) -> String {
@@ -242,11 +243,12 @@ pub trait DbExecutor {
 		Ok(sqlx::query_as!(
 			Comic,
 			"INSERT INTO Comics
-				(title, url_stub)
+				(id, title, url_stub)
 			VALUES
-				($1, $2)
+				($1, $2, $3)
 			RETURNING
 				id, title, url_stub, page_hits, date_modified, date_created;",
+			Uuid::from(Ulid::generate()),
 			title,
 			url_stub
 		)
