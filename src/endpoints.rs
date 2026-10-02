@@ -300,6 +300,7 @@ pub async fn set_comic_panel(
 		.bucket("pony-r2")
 		.content_encoding(String::from("image/png"))
 		.key(key)
+		.content_length(data.bytes_compressed as i64)
 		.presigned(config)
 		.await?;
 	db.insert_panel(comic.id, number, data.bytes_original, data.bytes_compressed)
