@@ -255,7 +255,7 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 			type = "application/json+oembed"
 			href = { "/oembed?" (encode) }
 			title = (title);
-		script crossorigin src = "/mane.js" {}
+		script crossorigin src = (env!("MANE_JS_PATH")) {}
 
 	}
 }

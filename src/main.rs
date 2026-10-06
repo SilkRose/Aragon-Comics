@@ -139,7 +139,7 @@ async fn main() -> Result<()> {
 			.service(set_rename_comic)
 			.service(set_comic_panel)
 			.service(auth::dev_session)
-			.service(Files::new("/assets", "./assets"))
+			.service(Files::new("/", "./target/client-scripts"))
 			.app_data(db.clone())
 			.app_data(fimfic.clone())
 			.app_data(http_client.clone())
