@@ -255,7 +255,12 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 			type = "application/json+oembed"
 			href = { "/oembed?" (encode) }
 			title = (title);
-		script crossorigin src = (env!("MANE_JS_PATH")) {}
+		script type = "module" {
+			(format!("import init, * as bindings from '{}';", env!("MANE_JS_PATH")))
+			(format!("const wasm = await init({{ module_or_path: '{}' }});", env!("MANE_WASM_PATH")))
+			"window.wasmBindings = bindings;"
+			"dispatchEvent(new CustomEvent('TrunkApplicationStarted', {detail: {wasm}}));"
+		}
 
 	}
 }

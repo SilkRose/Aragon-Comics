@@ -2,7 +2,6 @@ use pony::command::execute_command;
 use pony::fs::find_files_in_dir;
 use std::env;
 use std::error::Error;
-use std::fs::read_dir;
 use std::path::Path;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -16,10 +15,15 @@ fn main() -> Result<(), Box<dyn Error>> {
 	execute_command(&trunk_cmd.join(" "))?;
 	env::set_current_dir(Path::new("../target/client-scripts"))?;
 	let files = find_files_in_dir("./", false)?;
-	let mane = files
+	let mane_js = files
 		.iter()
 		.find(|file| file.starts_with("./mane") && file.ends_with(".js"))
 		.unwrap_or_else(|| panic!("Failed to find JS file!"));
-	println!("cargo::rustc-env=MANE_JS_PATH={mane}");
+	let mane_wasm = files
+		.iter()
+		.find(|file| file.starts_with("./mane") && file.ends_with(".wasm"))
+		.unwrap_or_else(|| panic!("Failed to find WASM file!"));
+	println!("cargo::rustc-env=MANE_JS_PATH={mane_js}");
+	println!("cargo::rustc-env=MANE_WASM_PATH={mane_wasm}");
 	Ok(())
 }
