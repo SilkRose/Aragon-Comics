@@ -17,22 +17,14 @@ fn main() {
 	descriptor.set_value(&closure);
 	mem::forget(closure);
 
-	Object::define_property_str(
-		&window,
-		&JsString::from("openDialog"),
-		&descriptor
-	).unwrap();
+	Object::define_property_str(&window, &JsString::from("openDialog"), &descriptor).unwrap();
 
 	let descriptor = PropertyDescriptor::new();
 	let closure = Closure::<dyn Fn(JsValue)>::new(close_dialog).into_js_value();
 	descriptor.set_value(&closure);
 	mem::forget(closure);
 
-	Object::define_property_str(
-		&window,
-		&JsString::from("closeDialog"),
-		&descriptor
-	).unwrap();
+	Object::define_property_str(&window, &JsString::from("closeDialog"), &descriptor).unwrap();
 }
 
 fn open_dialog(id: JsValue) {
