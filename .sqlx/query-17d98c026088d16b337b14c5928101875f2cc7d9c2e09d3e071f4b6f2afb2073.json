@@ -1,12 +1,12 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_sha256sum, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY panel_number ASC;",
+  "query": "UPDATE Panels\n\t\t\tSET\n\t\t\t\tpanel_revision = panel_revision + 1,\n\t\t\t\tbytes_original = $3,\n\t\t\t\tbytes_compressed = $4,\n\t\t\t\tdate_modified = now()\n\t\t\tWHERE\n\t\t\t\tcomic_id = $1\n\t\t\tAND\n\t\t\t\tpanel_number = $2\n\t\t\tRETURNING\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, upload_complete, date_modified, date_created;",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
         "name": "comic_id",
-        "type_info": "Uuid",
+        "type_info": "Int4",
         "origin": {
           "Table": {
             "table": "panels",
@@ -27,12 +27,12 @@
       },
       {
         "ordinal": 2,
-        "name": "panel_sha256sum",
-        "type_info": "Bpchar",
+        "name": "panel_revision",
+        "type_info": "Int4",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_sha256sum"
+            "name": "panel_revision"
           }
         }
       },
@@ -60,6 +60,17 @@
       },
       {
         "ordinal": 5,
+        "name": "upload_complete",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "panels",
+            "name": "upload_complete"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "date_modified",
         "type_info": "Timestamptz",
         "origin": {
@@ -70,7 +81,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "date_created",
         "type_info": "Timestamptz",
         "origin": {
@@ -83,7 +94,10 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Int4",
+        "Numeric",
+        "Int4",
+        "Int4"
       ]
     },
     "nullable": [
@@ -93,8 +107,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "94e4130e522f3d50f22f0f838c4177113e2e81fe6122f22784e0fa62919740e1"
+  "hash": "17d98c026088d16b337b14c5928101875f2cc7d9c2e09d3e071f4b6f2afb2073"
 }
