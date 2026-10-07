@@ -224,6 +224,32 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Rename" }
 		}
+		h2 { "Upload Panels" }
+		label { "Select and upload comic panels." }
+		input
+			type = "file"
+			id = "pony-up"
+			accept = "image/png"
+			class = "hidden"
+			onchange = "previewFiles()"
+			multiple {}
+		span class = "row" {
+			button onclick = "selectFiles()" { "Select Files" }
+			button onclick = "clearFiles()" { "Clear Selection" }
+			button onclick = "uploadFiles()" { "Upload Files" }
+		}
+		h2 { "Active Panels" }
+		@for panel in panels {
+			span {
+				img src = (
+					format!("r2.pony.sh/{}/{}-{}",
+						comic.id,
+						panel.panel_number,
+						panel.panel_revision
+					)
+				) {}
+			}
+		}
 	};
 	html_builder()
 		.head(head_html(&title, description, &link))
@@ -255,7 +281,7 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 			type = "application/json+oembed"
 			href = { "/oembed?" (encode) }
 			title = (title);
-		script crossorigin src = "./mane.js" {}
+		script crossorigin src = "/mane.js" {}
 
 	}
 }
