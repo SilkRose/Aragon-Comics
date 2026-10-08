@@ -381,6 +381,26 @@
 		display: none;
 	}
 
+	.preview {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		justify-content: center;
+	}
+
+	.panel-preview {
+		width: 190px;
+		height: 220px;
+		border-radius: 12px;
+		border-color: var(--table-border);
+		border-width: 3px;
+		border-style: solid;
+		img {
+			max-width: 180px;
+			max-height: 180px;
+		}
+	}
+
 	body {
 		max-width: 900px;
 		margin-inline: auto;

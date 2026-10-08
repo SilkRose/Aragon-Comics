@@ -238,6 +238,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			button onclick = "clearFiles()" { "Clear Selection" }
 			button onclick = "uploadFiles()" { "Upload Files" }
 		}
+		div id = "preview" class = "preview" {}
 		h2 { "Active Panels" }
 		@for panel in panels {
 			span {

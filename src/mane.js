@@ -11,38 +11,55 @@ function selectFiles() {
 }
 
 function previewFiles() {
-	let input = window.document.getElementById("pony-up");
-	let files = input.files;
+	const input = window.document.getElementById("pony-up");
+	const files = input.files;
 	if (files.length == 0) {
 		return;
 	}
-	for (const file in files) {
-		console.log(file.name)
+	const preview = document.getElementById("preview");
+	for (const file of files) {
+		const span = document.createElement("div");
+		span.classList.add("panel-preview");
+		const panel = document.createElement("img");
+		panel.setAttribute("loading", "lazy");
+		panel.src = URL.createObjectURL(file);
+		span.appendChild(panel);
+		const button = document.createElement("button");
+		button.textContent = "Remove";
+
+		span.appendChild(document.createElement("br"));
+		span.appendChild(button);
+		preview.appendChild(span);
 	}
+}
+
+function removeFile(name) {
+	const input = window.document.getElementById("pony-up");
+	const panel = document.getElementById(`preview-${name}`);
 }
 
 function clearFiles() {
 	document.getElementById('pony-up').files = null;
-	let preview = document.getElementById('panel-preview');
+	const preview = document.getElementById('preview');
 	if (preview) {
-		preview.remove();
+		preview.innerHTML = "";
 	}
 }
 
-function uploadFiless() {
-	let input = window.document.getElementById("pony-up");
-	let files = input.files;
+function uploadFiles() {
+	const input = window.document.getElementById("pony-up");
+	const files = input.files;
 	if (files.length == 0) {
 		return;
 	}
-	for (const file in files) {
+	for (const file of files) {
 		if (!file.type.startsWith("image/")) {
 			continue;
 		}
 		const img = document.createElement("img");
 		// img.classList.add("obj");
 		img.file = file;
-		preview.appendChild(img);
+		window.document.appendChild(img);
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
