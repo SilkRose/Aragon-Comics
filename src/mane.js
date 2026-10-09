@@ -11,36 +11,56 @@ function selectFiles() {
 }
 
 function previewFiles() {
-	const input = window.document.getElementById("pony-up");
-	const files = input.files;
+	const files = Array.from(window.document.getElementById("pony-up").files);
 	if (files.length == 0) {
 		return;
 	}
-	const preview = document.getElementById("preview");
+	files.sort((a, b) =>
+		Number(a.name.replace(".png", "")) -
+		Number(b.name.replace(".png", ""))
+	);
+	const preview = document.getElementById("preview-panels");
 	for (const file of files) {
-		const span = document.createElement("div");
-		span.classList.add("panel-preview");
+		const div = document.createElement("div");
+		div.classList.add("panel-div");
+		div.id = `preview-${file.name}`;
 		const panel = document.createElement("img");
 		panel.setAttribute("loading", "lazy");
 		panel.src = URL.createObjectURL(file);
-		span.appendChild(panel);
+		div.appendChild(panel);
+		const sub_div = document.createElement("div");
+		sub_div.classList.add("panel-info");
+		const p = document.createElement("p");
+		p.innerHTML = `<b>Filename:</b> ${file.name}`;
+		sub_div.appendChild(p);
 		const button = document.createElement("button");
+		button.classList.add("danger");
 		button.textContent = "Remove";
-
-		span.appendChild(document.createElement("br"));
-		span.appendChild(button);
-		preview.appendChild(span);
+		button.onclick = () => removeFile(file.name);
+		sub_div.appendChild(button);
+		div.appendChild(sub_div);
+		preview.appendChild(div);
 	}
 }
 
 function removeFile(name) {
-	const input = window.document.getElementById("pony-up");
+	const input = document.getElementById("pony-up");
 	const panel = document.getElementById(`preview-${name}`);
+	const new_files = new DataTransfer();
+	for (const file of input.files) {
+		if (file.name !== name) {
+			new_files.items.add(file);
+		}
+	}
+	if (panel != null) {
+		panel.remove();
+	}
+	input.files = new_files.files;
 }
 
 function clearFiles() {
 	document.getElementById('pony-up').files = null;
-	const preview = document.getElementById('preview');
+	const preview = document.getElementById('preview-panels');
 	if (preview) {
 		preview.innerHTML = "";
 	}

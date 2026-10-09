@@ -6,7 +6,7 @@
 	--font-family-heading: system-ui;
 	--font-family-heading-line-height: 1.1;
 	--font-family-code: monospace;
-	--body-max-width: 75ch;
+	--body-max-width: 80ch;
 }
 
 /* This reset was adapted from Kevin Powell's video: https://www.youtube.com/watch?v=CAPo3HZBWS0 */
@@ -381,24 +381,37 @@
 		display: none;
 	}
 
-	.preview {
+	.manage-panels {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
+		flex-direction: column;
 		justify-content: center;
+		gap: 12px;
+		margin-top: 12px;
 	}
 
-	.panel-preview {
-		width: 190px;
-		height: 220px;
+	.panel-div {
+		width: 100%;
+		max-width: 75ch;
 		border-radius: 12px;
 		border-color: var(--table-border);
 		border-width: 3px;
 		border-style: solid;
+		padding: 6px;
 		img {
-			max-width: 180px;
-			max-height: 180px;
+			max-width: 100%;
+			height: auto;
+			max-height: 70ch;
+			object-fit: contain;
 		}
+	}
+
+	.panel-info {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		margin-inline: 12px;
+		margin-block: 6px;
 	}
 
 	body {
