@@ -62,7 +62,7 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 			@let link = format!("/user/remove/{}", user.id);
 			button
 				class = "danger"
-				onclick = (format!("openDialog(\"{}\")", user.id))
+				onclick = (format!(r#"openDialog("{}")"#, user.id))
 					{ "Remove" }
 			dialog id = (user.id) closedby = "any" {
 				h2 { "Remove User" }
@@ -72,7 +72,7 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 					" from the authorized users list?"
 				}
 				span class = "spaced-row" {
-					button onclick = (format!("closeDialog(\"{}\")", user.id)) { "Close" }
+					button onclick = (format!(r#"closeDialog("{}")"#, user.id)) { "Close" }
 					button
 						type = "button"
 						class = "danger"

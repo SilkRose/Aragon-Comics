@@ -11,7 +11,8 @@ function selectFiles() {
 }
 
 function previewFiles() {
-	const files = Array.from(window.document.getElementById("pony-up").files);
+	const input = document.getElementById("pony-up");
+	const files = Array.from(input.files);
 	if (files.length == 0) {
 		return;
 	}
@@ -19,8 +20,16 @@ function previewFiles() {
 		Number(a.name.replace(".png", "")) -
 		Number(b.name.replace(".png", ""))
 	);
-	const preview = document.getElementById("preview-panels");
+	const sorted_files = new DataTransfer();
 	for (const file of files) {
+		sorted_files.items.add(file);
+	}
+	input.files = sorted_files.files;
+	const preview = document.getElementById('preview-panels');
+	if (preview) {
+		preview.innerHTML = "";
+	}
+	for (const file of input.files) {
 		const div = document.createElement("div");
 		div.classList.add("panel-div");
 		div.id = `preview-${file.name}`;
@@ -36,9 +45,35 @@ function previewFiles() {
 		const button = document.createElement("button");
 		button.classList.add("danger");
 		button.textContent = "Remove";
-		button.onclick = () => removeFile(file.name);
+		button.onclick = () => openDialog(file.name);
 		sub_div.appendChild(button);
 		div.appendChild(sub_div);
+		const dialog = document.createElement("dialog");
+		dialog.id = file.name;
+		dialog.closedBy = "any";
+		const dialog_title = document.createElement("h2");
+		dialog_title.innerText = "Remove Panel";
+		dialog.appendChild(dialog_title);
+		let dialog_panel = document.createElement("img");
+		dialog_panel.setAttribute("loading", "lazy");
+		dialog_panel.src = URL.createObjectURL(file);
+		dialog.appendChild(dialog_panel);
+		const dialog_text = document.createElement("p");
+		dialog_text.innerText = "Are you sure you want to remove this panel before it's uploaded?";
+		dialog.appendChild(dialog_text);
+		const dialog_span = document.createElement("span");
+		dialog_span.classList.add("spaced-row");
+		const dialog_close_button = document.createElement("button");
+		dialog_close_button.textContent = "Close";
+		dialog_close_button.onclick = () => closeDialog(file.name);
+		dialog_span.appendChild(dialog_close_button);
+		const dialog_remove_button = document.createElement("button");
+		dialog_remove_button.classList.add("danger");
+		dialog_remove_button.textContent = "Remove";
+		dialog_remove_button.onclick = () => removeFile(file.name);
+		dialog_span.appendChild(dialog_remove_button);
+		dialog.appendChild(dialog_span);
+		div.appendChild(dialog);
 		preview.appendChild(div);
 	}
 }
@@ -52,7 +87,7 @@ function removeFile(name) {
 			new_files.items.add(file);
 		}
 	}
-	if (panel != null) {
+	if (panel) {
 		panel.remove();
 	}
 	input.files = new_files.files;
