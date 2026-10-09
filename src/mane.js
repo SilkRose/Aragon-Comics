@@ -17,8 +17,8 @@ function previewFiles() {
 		return;
 	}
 	files.sort((a, b) =>
-		Number(a.name.replace(".png", "")) -
-		Number(b.name.replace(".png", ""))
+		Number(a.name.toLowerCase().replace(".png", "")) -
+		Number(b.name.toLowerCase().replace(".png", ""))
 	);
 	const sorted_files = new DataTransfer();
 	for (const file of files) {
@@ -101,25 +101,36 @@ function clearFiles() {
 	}
 }
 
-function uploadFiles() {
+let abort_upload = false;
+
+async function uploadFiles() {
+	abort_upload = false;
+	const upload = window.document.getElementById("panel-upload");
 	const input = window.document.getElementById("pony-up");
 	const files = input.files;
 	if (files.length == 0) {
 		return;
 	}
+	upload.showModal();
+	while (true) {
+		await sleep(100);
+		if (abort_upload) {
+			upload.close();
+			break;
+		}
+	}
 	for (const file of files) {
-		if (!file.type.startsWith("image/")) {
+		if (file.type !== "image/png") {
 			continue;
 		}
-		const img = document.createElement("img");
-		// img.classList.add("obj");
-		img.file = file;
-		window.document.appendChild(img);
-
 		const reader = new FileReader();
-		reader.onload = (e) => {
-			img.src = e.target.result;
-		};
+		reader.onload = (e) => { };
 		reader.readAsDataURL(file);
 	}
 }
+
+function cancelUpload() {
+	abort_upload = true;
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));

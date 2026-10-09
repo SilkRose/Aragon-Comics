@@ -256,6 +256,35 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 				}
 			}
 		}
+		dialog id = "panel-upload" closedby = "none" {
+				h2 { "Automating Panels" }
+				img {}
+				p { "The panel above is being:" }
+				ol {
+					li { "Uploaded to the server." }
+					li { "Compressed on the server." }
+					li { "Uploaded to online storage." }
+				}
+				label for = "progress" {
+					p {
+						"Panel Progress: "
+						span id = "panel-counter" {}
+						", "
+						span id = "panel-percent" {}
+					}
+
+				}
+				progress id = "progress" {} br;
+				p {
+					"Hit the cancel button to stop uploads "
+					"after the current panel has completed."
+				}
+				button
+					type = "button"
+					class = "danger"
+					onclick = "cancelUpload()"
+						{ "Cancel" }
+			}
 	};
 	html_builder()
 		.head(head_html(&title, description, &link))
