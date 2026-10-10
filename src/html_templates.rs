@@ -266,7 +266,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			@for panel in panels {
 				div id = (format!("active-{}", panel.panel_number)) class = "panel-div" {
 					img class = "panel" src = (
-						format!("r2.pony.sh/{}/{}-{}",
+						format!("https://r2.pony.sh/{}/{}-{}",
 							comic.id,
 							panel.panel_number,
 							panel.panel_revision
@@ -278,7 +278,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 				}
 			}
 		}
-		dialog id = "panel-upload" closedby = "none" {
+		dialog id = "panel-upload" closedby = "none" data-comic-id = (comic.id) {
 				h2 { "Automating Panels" }
 				img id = "upload-preview" class = "upload-preview" {}
 				p { "The panel above is being:" }

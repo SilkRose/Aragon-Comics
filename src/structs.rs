@@ -69,10 +69,3 @@ pub struct ComicPanelData {
 	pub bytes_compressed: i32,
 	pub latest_date: Option<DateTime<Utc>>,
 }
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct PanelData {
-	pub filename: String,
-	pub bytes_original: i32,
-	pub bytes_compressed: i32,
-}

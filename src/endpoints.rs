@@ -5,16 +5,14 @@ use crate::html_templates::*;
 use crate::structs::*;
 use crate::utility::*;
 use crate::{FimficCfg, HttpClient};
-use actix_web::web::{Path, Query, ThinData};
+use actix_web::web::{Path, Payload, Query, ThinData};
 use actix_web::{HttpRequest, HttpResponse, Responder, get, post};
 use aws_sdk_s3::Client;
-use aws_sdk_s3::presigning::PresigningConfigBuilder;
-use chrono::Utc;
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
+use oxipng::{Options, optimize_from_memory};
 use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
-use std::time::{Duration, SystemTime};
 use tokio::fs;
 
 #[cfg(not(debug_assertions))]
@@ -280,30 +278,37 @@ pub async fn get_manage_comic(
 		.body(page))
 }
 
-#[post("/comics/manage/{id}/panel")]
+#[post("/comics/manage/{id}/panel/{number}")]
 pub async fn set_comic_panel(
-	path: Path<i32>, body: String, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
+	path: Path<(i32, String)>, body: Payload, mut db: ThinData<Db>, s3client: ThinData<Client>,
+	_: SessionInfo,
 ) -> Result<impl Responder> {
-	let id = path.into_inner();
+	const MAX_SIZE: usize = 20 * 1024 * 1024; // 20MB
+	let (id, number) = path.into_inner();
 	let comic = db.get_comic_by_id(id).await?;
-	let data = serde_json::from_str::<PanelData>(&body)?;
-	let number = data.filename.to_ascii_lowercase();
+	let Ok(data) = body.to_bytes_limited(MAX_SIZE).await else {
+		return Ok(HttpResponse::PayloadTooLarge().finish());
+	};
+	let Ok(data) = data else {
+		return Ok(HttpResponse::InternalServerError().finish());
+	};
+	let original_bytes = data.len() as i32;
+	let data = optimize_from_memory(&data, &Options::from_preset(6))?;
+	let compressed_bytes = data.len() as i32;
+	let number = number.to_ascii_lowercase();
 	let number = number.trim_end_matches(".png");
 	let number = Decimal::from_str(number)?;
 	let key = format!("{}/{number}-", comic.id);
-	let config = PresigningConfigBuilder::default()
-		.start_time(SystemTime::from(Utc::now()))
-		.expires_in(Duration::from_mins(15))
-		.build()?;
-	let url = s3client
+	s3client
 		.put_object()
 		.bucket("pony-r2")
 		.content_encoding(String::from("image/png"))
 		.key(key)
-		.content_length(data.bytes_compressed as i64)
-		.presigned(config)
+		.content_length(compressed_bytes as i64)
+		.body(data.into())
+		.send()
 		.await?;
-	db.insert_panel(comic.id, number, data.bytes_original, data.bytes_compressed)
+	db.insert_panel(comic.id, number, original_bytes, compressed_bytes)
 		.await?;
-	Ok(HttpResponse::Ok().body(url.uri().to_string()))
+	Ok(HttpResponse::Ok().finish())
 }

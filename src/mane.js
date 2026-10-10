@@ -125,6 +125,8 @@ async function uploadFiles() {
 	if (count == 0) {
 		return;
 	}
+	const comic_id = upload.getAttribute("data-comic-id");
+	const endpoint = `/comics/manage/${comic_id}/panel`;
 	window.document.getElementById("panel-total").innerText = count;
 	const panel_index = window.document.getElementById("panel-index");
 	const panel_percent = window.document.getElementById("panel-percent");
@@ -169,10 +171,12 @@ async function uploadFiles() {
 				}, 1000);
 			}
 		}
-		const reader = new FileReader();
-		reader.onload = (e) => { };
-		reader.readAsDataURL(file);
-		await sleep(1000 + Math.random() * 100);
+		try {
+			await uploadFile(file, endpoint);
+		} catch (error) {
+			alert(error.message);
+		}
+		await sleep(100);
 		panel_percent.innerText = ((i++ / count) * 100).toFixed(2);
 		const time = new Date() - start_time;
 		total_time += time;
@@ -201,4 +205,22 @@ function calculateTime(remaining) {
 
 function formatPlural(value, unit) {
 	return `${value} ${unit}${value !== 1 ? "s" : ""}`;
+}
+
+function uploadFile(file, endpoint) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", `${endpoint}/${file.name}`);
+		xhr.setRequestHeader("Content-Type", "image/png");
+		xhr.onload = () => {
+			if (xhr.status < 200 || xhr.status >= 300) {
+				return reject(new Error(`Error processing file: ${file.name}`));
+			}
+			return resolve(xhr.responseText);
+		};
+		xhr.onerror = () => {
+			reject(new Error(`Failed to upload file: ${file.name}`));
+		};
+		xhr.send(file);
+	});
 }
