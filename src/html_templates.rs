@@ -280,7 +280,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		}
 		dialog id = "panel-upload" closedby = "none" {
 				h2 { "Automating Panels" }
-				img {}
+				img id = "upload-preview" class = "upload-preview" {}
 				p { "The panel above is being:" }
 				ol {
 					li { "Uploaded to the server." }
@@ -290,9 +290,12 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 				label for = "progress" {
 					p {
 						"Panel Progress: "
-						span id = "panel-counter" {}
+						span id = "panel-index" { "1" }
+						"/"
+						span id = "panel-total" {}
 						", "
-						span id = "panel-percent" {}
+						span id = "panel-percent" { "0.00" }
+						"%"
 					}
 
 				}

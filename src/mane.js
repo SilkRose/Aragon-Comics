@@ -121,26 +121,84 @@ async function uploadFiles() {
 	const upload = window.document.getElementById("panel-upload");
 	const input = window.document.getElementById("pony-up");
 	const files = input.files;
-	if (files.length == 0) {
+	const count = files.length;
+	if (count == 0) {
 		return;
 	}
+	window.document.getElementById("panel-total").innerText = count;
+	const panel_index = window.document.getElementById("panel-index");
+	const panel_percent = window.document.getElementById("panel-percent");
+	const panel_progress = document.getElementById("progress");
+	panel_progress.max = count;
+	const panel_preview = document.getElementById("upload-preview");
+	const countdown = document.getElementById("time-left");
 	upload.showModal();
 	let i = 1;
+	const times = [];
+	let total_time = 0;
+	let interval = null;
 	for (const file of files) {
+		const start_time = new Date();
+		panel_index.innerText = i;
+		panel_progress.value = i;
 		if (abort_upload) {
 			upload.close();
 			break;
 		}
 		if (file.type !== "image/png") {
-			continue;
+			alert("Invalid file in list!");
+			break;
+		}
+		panel_preview.src = URL.createObjectURL(file);
+		if (times.length) {
+			const average = total_time / times.length;
+			const remaining = average * (count - i);
+			const target = new Date(Date.now() + remaining);
+			if (!interval && i > 1 || i % 10 == 0) {
+				if (interval) {
+					clearInterval(interval);
+				}
+				interval = setInterval(function () {
+					let remaining = Math.max(0, (target - new Date()) / 1000);
+					let timer = calculateTime(remaining);
+					countdown.innerHTML = timer;
+					if (remaining <= 0) {
+						clearInterval(interval);
+						countdown.innerHTML = "Reloading…";
+					}
+				}, 1000);
+			}
 		}
 		const reader = new FileReader();
 		reader.onload = (e) => { };
 		reader.readAsDataURL(file);
-		await sleep(1000);
-		i++;
+		await sleep(1000 + Math.random() * 100);
+		panel_percent.innerText = ((i++ / count) * 100).toFixed(2);
+		const time = new Date() - start_time;
+		total_time += time;
+		times.push(time);
 	}
 	window.document.location.reload();
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function calculateTime(remaining) {
+	let days = Math.floor(remaining / 86400);
+	let hours = Math.floor((remaining % 86400) / 3600);
+	let minutes = Math.floor((remaining % 3600) / 60);
+	let secs = Math.floor(remaining % 60);
+	let parts = [];
+	if (days) parts.push(formatPlural(days, "day"));
+	if (hours) parts.push(formatPlural(hours, "hour"));
+	if (minutes) parts.push(formatPlural(minutes, "minute"));
+	if (secs) parts.push(formatPlural(secs, "second"));
+	if (parts.length === 0) {
+		parts.push("0 seconds");
+	}
+	return parts.join(", ");
+}
+
+function formatPlural(value, unit) {
+	return `${value} ${unit}${value !== 1 ? "s" : ""}`;
+}
