@@ -93,15 +93,28 @@ function removeFile(name) {
 	input.files = new_files.files;
 }
 
+function clearSelection() {
+	let count = document.getElementById('pony-up').files.length;
+	if (count > 0) {
+		document.getElementById("panel-count").innerText = count;
+		openDialog("clear-selection");
+	}
+}
+
 function clearFiles() {
-	document.getElementById('pony-up').files = null;
+	document.getElementById('pony-up').value = null;
 	const preview = document.getElementById('preview-panels');
 	if (preview) {
 		preview.innerHTML = "";
 	}
+	closeDialog("clear-selection");
 }
 
 let abort_upload = false;
+
+function cancelUpload() {
+	abort_upload = true;
+}
 
 async function uploadFiles() {
 	abort_upload = false;
@@ -112,25 +125,22 @@ async function uploadFiles() {
 		return;
 	}
 	upload.showModal();
-	while (true) {
-		await sleep(100);
+	let i = 1;
+	for (const file of files) {
 		if (abort_upload) {
 			upload.close();
 			break;
 		}
-	}
-	for (const file of files) {
 		if (file.type !== "image/png") {
 			continue;
 		}
 		const reader = new FileReader();
 		reader.onload = (e) => { };
 		reader.readAsDataURL(file);
+		await sleep(1000);
+		i++;
 	}
-}
-
-function cancelUpload() {
-	abort_upload = true;
+	window.document.location.reload();
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));

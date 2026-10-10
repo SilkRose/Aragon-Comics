@@ -233,10 +233,32 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			class = "hidden"
 			onchange = "previewFiles()"
 			multiple {}
+		script {
+			"document.getElementById('pony-up').value = null;"
+		}
 		span class = "row" {
 			button onclick = "selectFiles()" { "Select Files" }
-			button onclick = "clearFiles()" { "Clear Selection" }
+			button
+				class = "danger"
+				onclick = "clearSelection()"
+					{ "Clear Selection" }
 			button onclick = "uploadFiles()" { "Upload Files" }
+		}
+		dialog id = "clear-selection" closedby = "any" {
+			h2 { "Clear Selected Files" }
+			p {
+				"Are you sure you want to clear all "
+				span id = "panel-count" {}
+				" selected files for upload?"
+			}
+			span class = "spaced-row" {
+				button onclick = r#"closeDialog("clear-selection")"# { "Close" }
+				button
+					type = "button"
+					class = "danger"
+					onclick = "clearFiles()"
+						{ "Clear" }
+			}
 		}
 		div id = "preview-panels" class = "manage-panels" {}
 		h2 { "Active Panels" }
@@ -275,6 +297,10 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 
 				}
 				progress id = "progress" {} br;
+				p {
+					"Estimated time remaining: "
+					span id = "time-left" { "Calculating…" }
+				}
 				p {
 					"Hit the cancel button to stop uploads "
 					"after the current panel has completed."
