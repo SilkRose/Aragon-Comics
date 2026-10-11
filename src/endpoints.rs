@@ -293,21 +293,26 @@ pub async fn set_comic_panel(
 		return Ok(HttpResponse::InternalServerError().finish());
 	};
 	let original_bytes = data.len() as i32;
-	let data = optimize_from_memory(&data, &Options::from_preset(6))?;
+	let mut opts = Options::from_preset(6);
+	opts.fix_errors = true;
+	opts.strip = oxipng::StripChunks::Safe;
+	let data =
+		optimize_from_memory(&data, &opts).map_err(|e| format!("Failed to compress image: {e}"))?;
 	let compressed_bytes = data.len() as i32;
 	let number = number.to_ascii_lowercase();
 	let number = number.trim_end_matches(".png");
 	let number = Decimal::from_str(number)?;
-	let key = format!("{}/{number}-", comic.id);
+	let key = format!("{}/{number}-1", comic.id);
 	s3client
 		.put_object()
 		.bucket("pony-r2")
-		.content_encoding(String::from("image/png"))
+		.content_type(String::from("image/png"))
 		.key(key)
 		.content_length(compressed_bytes as i64)
 		.body(data.into())
 		.send()
-		.await?;
+		.await
+		.map_err(|e| format!("Failed to upload image: {e}"))?;
 	db.insert_panel(comic.id, number, original_bytes, compressed_bytes)
 		.await?;
 	Ok(HttpResponse::Ok().finish())

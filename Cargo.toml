@@ -21,7 +21,6 @@ lightningcss = { version = "1.0.0-alpha.72" }
 maud = { version = "0.27.0" }
 oxipng = { version = "10.2.1", default-features = false, features = [
 	"freestanding",
-	"zopfli",
 ] }
 pony = { git = "https://github.com/SilkRose/Pony", rev = "03cf3b82e88ab86b69cdfd04361175238051463b" }
 rand = { version = "0.10.3", default-features = false, features = [

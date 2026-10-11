@@ -301,7 +301,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 				}
 				progress id = "progress" {} br;
 				p {
-					"Estimated time remaining: "
+					"Time remaining: "
 					span id = "time-left" { "Calculating…" }
 				}
 				p {

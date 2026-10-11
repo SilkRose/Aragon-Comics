@@ -88,7 +88,7 @@ async fn main() -> Result<()> {
 		.region(Region::new("auto"))
 		.credentials_provider(credentials)
 		.endpoint_url(format!(
-			"https://{}.us.r2.cloudflarestorage.com",
+			"https://{}.r2.cloudflarestorage.com",
 			env_vars::cloudflare_account_id()
 		))
 		.build();
