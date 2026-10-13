@@ -134,6 +134,13 @@ async function uploadFiles() {
 	panel_progress.max = count;
 	const panel_preview = document.getElementById("upload-preview");
 	const countdown = document.getElementById("time-left");
+	const runtime = document.getElementById("runtime");
+	const start_time = Date.now();
+	setInterval(function () {
+		let time = (new Date() - start_time) / 1000;
+		let timer = calculateTime(time);
+		runtime.innerHTML = timer;
+	}, 500);
 	upload.showModal();
 	let i = 1;
 	const times = [];
@@ -166,9 +173,9 @@ async function uploadFiles() {
 					countdown.innerHTML = timer;
 					if (remaining <= 0) {
 						clearInterval(interval);
-						countdown.innerHTML = "Reloading…";
+						countdown.innerHTML = "soon™";
 					}
-				}, 1000);
+				}, 500);
 			}
 		}
 		try {
@@ -176,7 +183,6 @@ async function uploadFiles() {
 		} catch (error) {
 			alert(error.message);
 		}
-		await sleep(100);
 		panel_percent.innerText = ((i++ / count) * 100).toFixed(2);
 		const time = new Date() - start_time;
 		total_time += time;
@@ -187,11 +193,11 @@ async function uploadFiles() {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-function calculateTime(remaining) {
-	let days = Math.floor(remaining / 86400);
-	let hours = Math.floor((remaining % 86400) / 3600);
-	let minutes = Math.floor((remaining % 3600) / 60);
-	let secs = Math.floor(remaining % 60);
+function calculateTime(time) {
+	let days = Math.floor(time / 86400);
+	let hours = Math.floor((time % 86400) / 3600);
+	let minutes = Math.floor((time % 3600) / 60);
+	let secs = Math.floor(time % 60);
 	let parts = [];
 	if (days) parts.push(formatPlural(days, "day"));
 	if (hours) parts.push(formatPlural(hours, "hour"));
