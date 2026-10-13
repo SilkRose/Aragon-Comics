@@ -1,7 +1,5 @@
 #![feature(impl_trait_in_assoc_type)]
 
-use std::time::{Duration, Instant};
-
 use crate::endpoints::*;
 
 pub use self::database::*;
@@ -15,13 +13,6 @@ pub use actix_web::web::ThinData as Data;
 pub use actix_web::{App as ActixApp, HttpServer};
 pub use aws_sdk_s3::config::{Credentials, Region};
 pub use aws_sdk_s3::{Client, Config};
-use chrono::Utc;
-use oxipng::{Options, optimize_from_memory};
-use pony::bytes::FormatType::Abbreviation;
-use pony::bytes::format_size_bytes;
-use pony::fs::find_files_in_dir;
-use pony::time::format_milliseconds;
-use tokio::fs;
 
 mod auth;
 mod database;
@@ -45,8 +36,6 @@ pub const SITE_LINK: &str = if cfg!(debug_assertions) {
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-	// test_compression().await?;
-
 	env_vars::load_dotenv();
 	env_vars::check();
 
@@ -161,41 +150,5 @@ async fn main() -> Result<()> {
 
 	server.bind(("0.0.0.0", PORT))?.run().await?;
 
-	Ok(())
-}
-
-async fn test_compression() -> Result<()> {
-	let files = find_files_in_dir("/home/velvetremedy/comics/", true)?;
-	for i in 0..=6 {
-		let mut bytes_original = 0;
-		let mut bytes_compressed = 0;
-		let mut total_time = Duration::default();
-		for file in &files {
-			if !file.to_ascii_lowercase().ends_with(".png") || file.contains("MACOSX") {
-				continue;
-			}
-			let data = fs::read(file).await?;
-			bytes_original += data.len();
-			let mut opts = Options::from_preset(i);
-			opts.fix_errors = true;
-			opts.strip = oxipng::StripChunks::Safe;
-			let time = Instant::now();
-			let data = optimize_from_memory(&data, &opts)?;
-			total_time += time.elapsed();
-			bytes_compressed += data.len();
-		}
-		let bytes_saved = (bytes_original - bytes_compressed) as f64 / total_time.as_secs_f64();
-		println!("{} - preset level: {i}", Utc::now());
-		println!(
-			"	bytes original: {}, bytes compressed: {}, time: {}",
-			format_size_bytes(bytes_original as f64, Abbreviation)?,
-			format_size_bytes(bytes_compressed as f64, Abbreviation)?,
-			format_milliseconds(total_time.as_millis(), None)?
-		);
-		println!(
-			"	bytes saved per second: {}",
-			format_size_bytes(bytes_saved, Abbreviation)?,
-		);
-	}
 	Ok(())
 }
