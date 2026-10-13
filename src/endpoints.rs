@@ -293,7 +293,7 @@ pub async fn set_comic_panel(
 		return Ok(HttpResponse::InternalServerError().finish());
 	};
 	let original_bytes = data.len() as i32;
-	let mut opts = Options::from_preset(6);
+	let mut opts = Options::from_preset(4);
 	opts.fix_errors = true;
 	opts.strip = oxipng::StripChunks::Safe;
 	let data =
