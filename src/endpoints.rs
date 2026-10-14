@@ -278,14 +278,15 @@ pub async fn get_manage_comic(
 		.body(page))
 }
 
-#[post("/comics/manage/{id}/panel/{number}")]
+#[post("/comics/manage/{comic_id}/panel/{filename}")]
 pub async fn set_comic_panel(
 	path: Path<(i32, String)>, body: Payload, mut db: ThinData<Db>, s3client: ThinData<Client>,
 	_: SessionInfo,
 ) -> Result<impl Responder> {
 	const MAX_SIZE: usize = 20 * 1024 * 1024; // 20MB
-	let (id, number) = path.into_inner();
-	let comic = db.get_comic_by_id(id).await?;
+	let (comic_id, filename) = path.into_inner();
+	let comic = db.get_comic_by_id(comic_id).await?;
+	let number = Decimal::from_str(filename.to_ascii_lowercase().trim_end_matches(".png"))?;
 	let Ok(data) = body.to_bytes_limited(MAX_SIZE).await else {
 		return Ok(HttpResponse::PayloadTooLarge().finish());
 	};
@@ -299,10 +300,20 @@ pub async fn set_comic_panel(
 	let data =
 		optimize_from_memory(&data, &opts).map_err(|e| format!("Failed to compress image: {e}"))?;
 	let compressed_bytes = data.len() as i32;
-	let number = number.to_ascii_lowercase();
-	let number = number.trim_end_matches(".png");
-	let number = Decimal::from_str(number)?;
-	let key = format!("{}/{number}-1", comic.id);
+	let panel = db
+		.insert_panel(comic.id, number, original_bytes, compressed_bytes)
+		.await?;
+	if panel.revision > 1 {
+		let key = format!("{}/{number}-{}", comic.id, panel.revision - 1);
+		s3client
+			.delete_object()
+			.bucket("pony-r2")
+			.key(key)
+			.send()
+			.await
+			.map_err(|e| format!("Failed to delete image: {e}"))?;
+	}
+	let key = format!("{}/{number}-{}", comic.id, panel.revision);
 	s3client
 		.put_object()
 		.bucket("pony-r2")
@@ -313,7 +324,5 @@ pub async fn set_comic_panel(
 		.send()
 		.await
 		.map_err(|e| format!("Failed to upload image: {e}"))?;
-	db.insert_panel(comic.id, number, original_bytes, compressed_bytes)
-		.await?;
 	Ok(HttpResponse::Ok().finish())
 }

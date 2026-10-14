@@ -53,8 +53,8 @@ pub struct Comic {
 #[derive(Debug, Clone)]
 pub struct Panel {
 	pub comic_id: i32,
-	pub panel_number: Decimal,
-	pub panel_revision: i32,
+	pub number: Decimal,
+	pub revision: i32,
 	pub bytes_original: i32,
 	pub bytes_compressed: i32,
 	pub upload_complete: bool,

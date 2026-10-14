@@ -264,12 +264,12 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		h2 { "Active Panels" }
 		div id = "active-panels" class = "manage-panels" {
 			@for panel in panels {
-				div id = (format!("active-{}", panel.panel_number)) class = "panel-div" {
+				div id = (format!("active-{}", panel.number)) class = "panel-div" {
 					img class = "panel" src = (
 						format!("https://r2.pony.sh/{}/{}-{}",
 							comic.id,
-							panel.panel_number,
-							panel.panel_revision
+							panel.number,
+							panel.revision
 						)
 					) {}
 					div {

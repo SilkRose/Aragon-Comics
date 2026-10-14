@@ -340,19 +340,25 @@ pub trait DbExecutor {
 	}
 
 	async fn insert_panel(
-		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+		&mut self, comic_id: i32, number: Decimal, bytes_original: i32, bytes_compressed: i32,
 	) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"INSERT INTO Panels
-				(comic_id, panel_number, bytes_original, bytes_compressed)
+				(comic_id, number, bytes_original, bytes_compressed)
 			VALUES
 				($1, $2, $3, $4)
+			ON CONFLICT (comic_id, number)
+			DO UPDATE SET
+            revision = Panels.revision + 1,
+            bytes_original = EXCLUDED.bytes_original,
+            bytes_compressed = EXCLUDED.bytes_compressed,
+            date_modified = now()
 			RETURNING
-				comic_id, panel_number, panel_revision, bytes_original,
-				bytes_compressed, upload_complete, date_modified, date_created;",
+				comic_id, number, revision, bytes_original, bytes_compressed,
+				upload_complete, date_modified, date_created;",
 			comic_id,
-			panel_number,
+			number,
 			bytes_original,
 			bytes_compressed
 		)
@@ -361,19 +367,19 @@ pub trait DbExecutor {
 		.map_err(insert_err)?)
 	}
 
-	async fn get_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<Panel> {
+	async fn get_panel(&mut self, comic_id: i32, number: Decimal) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, panel_number, panel_revision, bytes_original,
-				bytes_compressed, upload_complete, date_modified, date_created
+				comic_id, number, revision, bytes_original, bytes_compressed,
+				upload_complete, date_modified, date_created
 			FROM Panels
 			WHERE
 				comic_id = $1
 			AND
-				panel_number = $2;",
+				number = $2;",
 			comic_id,
-			panel_number
+			number
 		)
 		.fetch_one(self.executor())
 		.await
@@ -384,11 +390,11 @@ pub trait DbExecutor {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, panel_number, panel_revision, bytes_original,
-				bytes_compressed, upload_complete, date_modified, date_created
+				comic_id, number, revision, bytes_original, bytes_compressed,
+				upload_complete, date_modified, date_created
 			FROM Panels
 			WHERE comic_id = $1
-			ORDER BY panel_number ASC;",
+			ORDER BY number ASC;",
 			comic_id
 		)
 		.fetch_all(self.executor())
@@ -397,25 +403,25 @@ pub trait DbExecutor {
 	}
 
 	async fn update_panel_revision(
-		&mut self, comic_id: i32, panel_number: Decimal, bytes_original: i32, bytes_compressed: i32,
+		&mut self, comic_id: i32, number: Decimal, bytes_original: i32, bytes_compressed: i32,
 	) -> Result<Panel> {
 		Ok(sqlx::query_as!(
 			Panel,
 			"UPDATE Panels
 			SET
-				panel_revision = panel_revision + 1,
+				revision = revision + 1,
 				bytes_original = $3,
 				bytes_compressed = $4,
 				date_modified = now()
 			WHERE
 				comic_id = $1
 			AND
-				panel_number = $2
+				number = $2
 			RETURNING
-				comic_id, panel_number, panel_revision, bytes_original,
-				bytes_compressed, upload_complete, date_modified, date_created;",
+				comic_id, number, revision, bytes_original, bytes_compressed,
+				upload_complete, date_modified, date_created;",
 			comic_id,
-			panel_number,
+			number,
 			bytes_original,
 			bytes_compressed
 		)
@@ -424,15 +430,15 @@ pub trait DbExecutor {
 		.map_err(update_err)?)
 	}
 
-	async fn delete_panel(&mut self, comic_id: i32, panel_number: Decimal) -> Result<u64> {
+	async fn delete_panel(&mut self, comic_id: i32, number: Decimal) -> Result<u64> {
 		Ok(sqlx::query!(
 			"DELETE FROM Panels
 			WHERE
 				comic_id = $1
 			AND
-				panel_number = $2;",
+				number = $2;",
 			comic_id,
-			panel_number
+			number
 		)
 		.execute(self.executor())
 		.await

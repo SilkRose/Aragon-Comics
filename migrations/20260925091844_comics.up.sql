@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS Comics (
 
 CREATE TABLE IF NOT EXISTS Panels (
 	comic_id         integer     NOT NULL,
-	panel_number     decimal     NOT NULL,
-	panel_revision   integer     NOT NULL DEFAULT 1,
+	number           decimal     NOT NULL,
+	revision         integer     NOT NULL DEFAULT 1,
 	bytes_original   integer     NOT NULL,
 	bytes_compressed integer     NOT NULL,
 	upload_complete  boolean     NOT NULL DEFAULT false,
@@ -26,5 +26,5 @@ CREATE TABLE IF NOT EXISTS Panels (
 	CONSTRAINT Panels_bytes_compressed_ck
 		CHECK (bytes_compressed > 0),
 
-	CONSTRAINT Panels_pk PRIMARY KEY (comic_id, panel_number)
+	CONSTRAINT Panels_pk PRIMARY KEY (comic_id, number)
 );
