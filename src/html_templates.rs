@@ -265,13 +265,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		div id = "active-panels" class = "manage-panels" {
 			@for panel in panels {
 				div id = (format!("active-{}", panel.number)) class = "panel-div" {
-					img class = "panel" src = (
-						format!("https://r2.pony.sh/{}/{}-{}",
-							comic.id,
-							panel.number,
-							panel.revision
-						)
-					) {}
+					img class = "panel" src = (format!("https://r2.pony.sh/{}", panel.key())) {}
 					div class = "panel-info" {
 						p {
 							b { "Number: " }
@@ -295,13 +289,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 					}
 					dialog id = (panel.number) closedby = "any" {
 						h2 { "Delete Panel" }
-						img src = (
-							format!("https://r2.pony.sh/{}/{}-{}",
-								comic.id,
-								panel.number,
-								panel.revision
-							)
-						) {}
+						img src = (format!("https://r2.pony.sh/{}", panel.key())) {}
 						p { "Are you sure you want to delete delete this panel?" }
 						span class = "spaced-row" {
 							button
@@ -438,21 +426,6 @@ fn input_text_required(id: &str, name: &str, min: u32, max: u32) -> PreEscaped<S
 			name = (name)
 			minlength = (min)
 			maxlength = (max)
-			required {}
-	)
-}
-
-fn input_text_value_required(
-	id: &str, name: &str, min: u32, max: u32, value: &str,
-) -> PreEscaped<String> {
-	html!	(
-		input
-			id = (id)
-			type = "text"
-			name = (name)
-			minlength = (min)
-			maxlength = (max)
-			value = (value)
 			required {}
 	)
 }

@@ -50,6 +50,16 @@ impl Db {
 		let tx = self.pool.begin().await?;
 		Ok(DbTransaction { tx })
 	}
+
+	pub async fn insert_panel_tx(
+		&self, comic_id: i32, number: Decimal, bytes_original: i32, bytes_compressed: i32,
+	) -> Result<(DbTransaction<'_>, Panel)> {
+		let mut tx = self.transaction().await?;
+		let panel = tx
+			.insert_panel(comic_id, number, bytes_original, bytes_compressed)
+			.await?;
+		Ok((tx, panel))
+	}
 }
 
 impl DbExecutor for Db {
@@ -65,7 +75,7 @@ pub struct DbTransaction<'c> {
 }
 
 impl<'c> DbTransaction<'c> {
-	async fn commit(self) -> Result<()> {
+	pub async fn commit(self) -> Result<()> {
 		self.tx.commit().await?;
 		Ok(())
 	}
@@ -355,8 +365,8 @@ pub trait DbExecutor {
             bytes_compressed = EXCLUDED.bytes_compressed,
             date_modified = now()
 			RETURNING
-				comic_id, number, revision, bytes_original, bytes_compressed,
-				upload_complete, date_modified, date_created;",
+				comic_id, number, revision, bytes_original,
+				bytes_compressed, date_modified, date_created;",
 			comic_id,
 			number,
 			bytes_original,
@@ -371,8 +381,8 @@ pub trait DbExecutor {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, number, revision, bytes_original, bytes_compressed,
-				upload_complete, date_modified, date_created
+				comic_id, number, revision, bytes_original,
+				bytes_compressed, date_modified, date_created
 			FROM Panels
 			WHERE
 				comic_id = $1
@@ -390,8 +400,8 @@ pub trait DbExecutor {
 		Ok(sqlx::query_as!(
 			Panel,
 			"SELECT
-				comic_id, number, revision, bytes_original, bytes_compressed,
-				upload_complete, date_modified, date_created
+				comic_id, number, revision, bytes_original,
+				bytes_compressed, date_modified, date_created
 			FROM Panels
 			WHERE comic_id = $1
 			ORDER BY number ASC;",
@@ -400,34 +410,6 @@ pub trait DbExecutor {
 		.fetch_all(self.executor())
 		.await
 		.map_err(select_err)?)
-	}
-
-	async fn update_panel_revision(
-		&mut self, comic_id: i32, number: Decimal, bytes_original: i32, bytes_compressed: i32,
-	) -> Result<Panel> {
-		Ok(sqlx::query_as!(
-			Panel,
-			"UPDATE Panels
-			SET
-				revision = revision + 1,
-				bytes_original = $3,
-				bytes_compressed = $4,
-				date_modified = now()
-			WHERE
-				comic_id = $1
-			AND
-				number = $2
-			RETURNING
-				comic_id, number, revision, bytes_original, bytes_compressed,
-				upload_complete, date_modified, date_created;",
-			comic_id,
-			number,
-			bytes_original,
-			bytes_compressed
-		)
-		.fetch_one(self.executor())
-		.await
-		.map_err(update_err)?)
 	}
 
 	async fn delete_panel(&mut self, comic_id: i32, number: Decimal) -> Result<u64> {

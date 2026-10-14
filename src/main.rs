@@ -96,6 +96,9 @@ async fn main() -> Result<()> {
 	let s3client = Client::from_conf(s3config);
 	let s3client = Data(s3client);
 
+	let upload_lock = tokio::sync::Mutex::new(());
+	let upload_lock = actix_web::web::Data::new(upload_lock);
+
 	let create_dev_session = env_vars::create_dev_session().is_some();
 	let token = rand::gen_auth_token();
 
@@ -145,6 +148,7 @@ async fn main() -> Result<()> {
 			.app_data(fimfic.clone())
 			.app_data(http_client.clone())
 			.app_data(s3client.clone())
+			.app_data(upload_lock.clone())
 			.app_data(dev_session.clone())
 			.wrap(Compress::default())
 	});

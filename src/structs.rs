@@ -57,9 +57,18 @@ pub struct Panel {
 	pub revision: i32,
 	pub bytes_original: i32,
 	pub bytes_compressed: i32,
-	pub upload_complete: bool,
 	pub date_modified: DateTime<Utc>,
 	pub date_created: DateTime<Utc>,
+}
+
+impl Panel {
+	pub fn key(&self) -> String {
+		format!("{}/{}-{}", self.comic_id, self.number, self.revision)
+	}
+
+	pub fn previous_key(&self) -> String {
+		format!("{}/{}-{}", self.comic_id, self.number, self.revision - 1)
+	}
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

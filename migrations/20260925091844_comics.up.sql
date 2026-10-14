@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS Panels (
 	revision         integer     NOT NULL DEFAULT 1,
 	bytes_original   integer     NOT NULL,
 	bytes_compressed integer     NOT NULL,
-	upload_complete  boolean     NOT NULL DEFAULT false,
 	date_modified    timestamptz NOT NULL DEFAULT now(),
 	date_created     timestamptz NOT NULL DEFAULT now(),
 

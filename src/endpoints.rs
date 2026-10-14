@@ -5,7 +5,7 @@ use crate::html_templates::*;
 use crate::structs::*;
 use crate::utility::*;
 use crate::{FimficCfg, HttpClient};
-use actix_web::web::{Path, Payload, Query, ThinData};
+use actix_web::web::{Data, Path, Payload, Query, ThinData};
 use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post};
 use aws_sdk_s3::Client;
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
@@ -14,6 +14,7 @@ use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use tokio::fs;
+use tokio::sync::Mutex;
 
 #[cfg(not(debug_assertions))]
 use actix_web::web::Bytes;
@@ -248,6 +249,9 @@ pub async fn set_rename_comic(
 	path: Path<i32>, queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
 ) -> Result<impl Responder> {
 	let id = path.into_inner();
+	let Ok(_) = db.get_comic_by_id(id).await else {
+		return Ok(HttpResponse::NotFound().finish());
+	};
 	let Some(title) = queries.into_inner().get("title").cloned() else {
 		let msg = "Missing title parameter.";
 		return Ok(HttpResponse::BadRequest().body(msg));
@@ -258,7 +262,6 @@ pub async fn set_rename_comic(
 		.map(|c| c.to_ascii_lowercase())
 		.map(|c| if c == ' ' { '-' } else { c })
 		.collect::<String>();
-	let comic = db.get_comic_by_id(id).await?;
 	db.update_comic_title(id, &url_stub, &title).await?;
 	Ok(HttpResponse::SeeOther()
 		.append_header(("Location", format!("/comics/manage/{url_stub}")))
@@ -281,7 +284,7 @@ pub async fn get_manage_comic(
 #[post("/comics/manage/{comic_id}/panel/{filename}")]
 pub async fn set_comic_panel(
 	path: Path<(i32, String)>, body: Payload, mut db: ThinData<Db>, s3client: ThinData<Client>,
-	_: SessionInfo,
+	lock: Data<Mutex<()>>, _: SessionInfo,
 ) -> Result<impl Responder> {
 	const MAX_SIZE: usize = 20 * 1024 * 1024; // 20MB
 	let (comic_id, filename) = path.into_inner();
@@ -297,33 +300,39 @@ pub async fn set_comic_panel(
 	let mut opts = Options::from_preset(4);
 	opts.fix_errors = true;
 	opts.strip = oxipng::StripChunks::Safe;
-	let data =
-		optimize_from_memory(&data, &opts).map_err(|e| format!("Failed to compress image: {e}"))?;
+	let data = {
+		tokio::task::spawn_blocking(move || {
+			let _guard = lock.blocking_lock();
+			optimize_from_memory(&data, &opts)
+		})
+		.await
+		.map_err(|e| format!("Compression task failed: {e}"))?
+		.map_err(|e| format!("Failed to compress image: {e}"))?
+	};
 	let compressed_bytes = data.len() as i32;
-	let panel = db
-		.insert_panel(comic.id, number, original_bytes, compressed_bytes)
+	let (tx, panel) = db
+		.insert_panel_tx(comic.id, number, original_bytes, compressed_bytes)
 		.await?;
 	if panel.revision > 1 {
-		let key = format!("{}/{number}-{}", comic.id, panel.revision - 1);
 		s3client
 			.delete_object()
 			.bucket("pony-r2")
-			.key(key)
+			.key(panel.previous_key())
 			.send()
 			.await
 			.map_err(|e| format!("Failed to delete image: {e}"))?;
 	}
-	let key = format!("{}/{number}-{}", comic.id, panel.revision);
 	s3client
 		.put_object()
 		.bucket("pony-r2")
 		.content_type(String::from("image/png"))
-		.key(key)
+		.key(panel.key())
 		.content_length(compressed_bytes as i64)
 		.body(data.into())
 		.send()
 		.await
 		.map_err(|e| format!("Failed to upload image: {e}"))?;
+	tx.commit().await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
@@ -332,14 +341,15 @@ pub async fn set_delete_panel(
 	path: Path<(i32, String)>, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
 ) -> Result<impl Responder> {
 	let (comic_id, number) = path.into_inner();
-	let comic = db.get_comic_by_id(comic_id).await?;
+	let Ok(_) = db.get_comic_by_id(comic_id).await else {
+		return Ok(HttpResponse::NotFound().finish());
+	};
 	let number = Decimal::from_str(&number)?;
 	let panel = db.get_panel(comic_id, number).await?;
-	let key = format!("{}/{number}-{}", comic.id, panel.revision);
 	s3client
 		.delete_object()
 		.bucket("pony-r2")
-		.key(key)
+		.key(panel.key())
 		.send()
 		.await
 		.map_err(|e| format!("Failed to delete image: {e}"))?;
