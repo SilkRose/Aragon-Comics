@@ -21,10 +21,6 @@ fn delete_err(err: sqlx::Error) -> String {
 	format!("database deletion error:\n{err}")
 }
 
-fn count_err() -> &'static str {
-	"database counting error"
-}
-
 fn db_expect() -> &'static str {
 	"database constraints means this resource will always be present in the database."
 }
@@ -426,5 +422,21 @@ pub trait DbExecutor {
 		.await
 		.map_err(delete_err)?
 		.rows_affected())
+	}
+
+	async fn get_comic_data(&mut self) -> Result<ComicData> {
+		Ok(sqlx::query_as!(
+			ComicData,
+			r#"SELECT
+            (SELECT COUNT(*) FROM Comics) AS "comics!",
+            (SELECT COUNT(*) FROM Panels) AS "panels!",
+            (SELECT COALESCE(SUM(revision), 0) FROM Panels) AS "revisions!",
+            (SELECT COALESCE(SUM(bytes_original), 0) FROM Panels) AS "bytes_original!",
+            (SELECT COALESCE(SUM(bytes_compressed), 0) FROM Panels) AS "bytes_compressed!",
+            (SELECT COALESCE(SUM(page_hits), 0) FROM Comics)::BIGINT AS "page_hits!";"#
+		)
+		.fetch_one(self.executor())
+		.await
+		.map_err(select_err)?)
 	}
 }

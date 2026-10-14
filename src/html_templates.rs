@@ -4,6 +4,7 @@ use bon::builder;
 use maud::{DOCTYPE, PreEscaped, html};
 use pony::bytes::FormatType::Abbreviation;
 use pony::bytes::format_size_bytes;
+use pony::number_format::{format_number_i128, format_number_u128};
 use url::form_urlencoded;
 
 #[builder]
@@ -160,10 +161,10 @@ pub fn home_html(user: Option<User>) -> String {
 		.call()
 }
 
-pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
+pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>, data: ComicData) -> String {
 	let heading = "Comics";
 	let title: String = format!("{heading} - {SITE_NAME}");
-	let description = "Comic list and new comic form.";
+	let description = "Comic list, statistics and a new comic form.";
 	let link = format!("{SITE_LINK}/comics");
 	let mane = html! {
 		h1 { (heading) }
@@ -173,6 +174,21 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 			label for = "title" { "Title:" }
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Create" }
+		}
+		h2 { "Comic Statistics" }
+		p {
+			b { "Comics: " }
+			(data.comics)
+			b { " Panels: " }
+			(format_number_u128(data.panels as u128).unwrap())
+			b { " Panel Revisions: " }
+			(format_number_u128(data.revisions as u128).unwrap()) br;
+			b { "Bytes Original/Compressed: " }
+			(&format_size_bytes(data.bytes_original as f64, Abbreviation).unwrap())
+			"/"
+			(&format_size_bytes(data.bytes_compressed as f64, Abbreviation).unwrap())
+			b { " Page Hits: " }
+			(format_number_i128(data.page_hits).unwrap())
 		}
 		h2 { "Comic List" }
 		@for (comic, panel_data) in comics {
@@ -186,7 +202,7 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 					"/"
 					(&format_size_bytes(panel_data.bytes_compressed as f64, Abbreviation).unwrap())
 					b { " Page Hits: " }
-					(comic.page_hits)
+					(format_number_u128(comic.page_hits as u128).unwrap())
 					" "
 					a href = (format!("/comics/manage/{}", comic.url_stub)) { "Manage" sup { "↗" } }
 				}
@@ -219,6 +235,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		h1 { a href = (comic.link()) { (comic.title) sup { "↗" } } " - Manage" }
 		p { (description) }
 		h2 { "Rename Comic" }
+		p { "Rename the comic. (Updates the link in the process.)" }
 		form class = "row" method = "get" action = (format!("/comics/rename/{}", comic.id)) {
 			label for = "title" { "Title:" }
 			(input_text_required("title", "title", 1, 256))
@@ -232,7 +249,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			button onclick = (format!(r#"copyBbcode("{}")"#, comic.id)) { "Copy BBCode" }
 		}
 		h2 { "Upload Panels" }
-		label { "Select and upload comic panels." }
+		p { label { "Select and upload comic panels." } }
 		input
 			type = "file"
 			id = "pony-up"
@@ -330,7 +347,6 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 						span id = "panel-percent" { "0.00" }
 						"%"
 					}
-
 				}
 				progress id = "progress" {} br;
 				p {

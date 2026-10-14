@@ -238,7 +238,8 @@ pub async fn get_comics(mut db: ThinData<Db>, _: SessionInfo) -> Result<impl Res
 		};
 		comic_data.push((comic, panel));
 	}
-	let page = comic_html(comic_data);
+	let data = db.get_comic_data().await?;
+	let page = comic_html(comic_data, data);
 	Ok(HttpResponse::Ok()
 		.content_type("text/html; charset=utf-8")
 		.body(page))
