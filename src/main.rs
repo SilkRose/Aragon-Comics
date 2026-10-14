@@ -138,6 +138,7 @@ async fn main() -> Result<()> {
 			.service(set_new_comic)
 			.service(set_rename_comic)
 			.service(set_comic_panel)
+			.service(set_delete_panel)
 			.service(auth::dev_session)
 			.service(Files::new("/", "./target/client-scripts"))
 			.app_data(db.clone())

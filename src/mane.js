@@ -191,8 +191,6 @@ async function uploadFiles() {
 	window.document.location.reload();
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
 function calculateTime(time) {
 	let days = Math.floor(time / 86400);
 	let hours = Math.floor((time % 86400) / 3600);
@@ -228,5 +226,36 @@ function uploadFile(file, endpoint) {
 			reject(new Error(`Failed to upload file: ${file.name}`));
 		};
 		xhr.send(file);
+	});
+}
+
+async function deletePanel(number) {
+	const panel = document.getElementById(`active-${number}`);
+	const dialog = document.getElementById(number);
+	try {
+		await DeleteReq(number);
+	} catch (error) {
+		alert(error.message);
+	}
+	dialog.close();
+	panel.remove();
+}
+
+function DeleteReq(panel_number) {
+	const upload = window.document.getElementById("panel-upload");
+	const comic_id = upload.getAttribute("data-comic-id");
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("DELETE", `/comics/manage/${comic_id}/panel/${panel_number}`);
+		xhr.onload = () => {
+			if (xhr.status < 200 || xhr.status >= 300) {
+				return reject(new Error(`Error deleting panel: ${panel_number}`));
+			}
+			return resolve(xhr.responseText);
+		};
+		xhr.onerror = () => {
+			reject(new Error(`Failed to delete panel: ${file.name}`));
+		};
+		xhr.send();
 	});
 }

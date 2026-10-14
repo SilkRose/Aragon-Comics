@@ -272,8 +272,46 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 							panel.revision
 						)
 					) {}
-					div {
-						""
+					div class = "panel-info" {
+						p {
+							b { "Number: " }
+							(panel.number)
+							b { " Revision: " }
+							(panel.revision)
+							b { " Bytes Original/Compressed: " }
+							(format_size_bytes(panel.bytes_original as f64, Abbreviation).unwrap())
+							"/"
+							(format_size_bytes(panel.bytes_compressed as f64, Abbreviation).unwrap())
+							br;
+							b { "Created: " }
+							(&panel.date_created.format("%y-%m-%d %H:%M"))
+							b { " Modified: " }
+							(&panel.date_modified.format("%y-%m-%d %H:%M"))
+						}
+						button
+							class = "danger"
+							onclick = (format!(r#"openDialog("{}")"#, panel.number))
+							{ "Delete" }
+					}
+					dialog id = (panel.number) closedby = "any" {
+						h2 { "Delete Panel" }
+						img src = (
+							format!("https://r2.pony.sh/{}/{}-{}",
+								comic.id,
+								panel.number,
+								panel.revision
+							)
+						) {}
+						p { "Are you sure you want to delete delete this panel?" }
+						span class = "spaced-row" {
+							button
+								onclick = (format!(r#"closeDialog("{}")"#, panel.number))
+								{ "Close" }
+							button
+								class = "danger"
+								onclick = (format!(r#"deletePanel("{}")"#, panel.number))
+								{ "Delete" }
+						}
 					}
 				}
 			}

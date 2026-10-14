@@ -6,7 +6,7 @@ use crate::structs::*;
 use crate::utility::*;
 use crate::{FimficCfg, HttpClient};
 use actix_web::web::{Path, Payload, Query, ThinData};
-use actix_web::{HttpRequest, HttpResponse, Responder, get, post};
+use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post};
 use aws_sdk_s3::Client;
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use oxipng::{Options, optimize_from_memory};
@@ -324,5 +324,25 @@ pub async fn set_comic_panel(
 		.send()
 		.await
 		.map_err(|e| format!("Failed to upload image: {e}"))?;
+	Ok(HttpResponse::Ok().finish())
+}
+
+#[delete("/comics/manage/{comic_id}/panel/{filename}")]
+pub async fn set_delete_panel(
+	path: Path<(i32, String)>, mut db: ThinData<Db>, s3client: ThinData<Client>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let (comic_id, number) = path.into_inner();
+	let comic = db.get_comic_by_id(comic_id).await?;
+	let number = Decimal::from_str(&number)?;
+	let panel = db.get_panel(comic_id, number).await?;
+	let key = format!("{}/{number}-{}", comic.id, panel.revision);
+	s3client
+		.delete_object()
+		.bucket("pony-r2")
+		.key(key)
+		.send()
+		.await
+		.map_err(|e| format!("Failed to delete image: {e}"))?;
+	db.delete_panel(comic_id, number).await?;
 	Ok(HttpResponse::Ok().finish())
 }
