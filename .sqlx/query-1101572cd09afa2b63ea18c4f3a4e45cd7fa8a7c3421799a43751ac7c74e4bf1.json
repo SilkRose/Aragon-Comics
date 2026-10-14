@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO Panels\n\t\t\t\t(comic_id, panel_number, bytes_original, bytes_compressed)\n\t\t\tVALUES\n\t\t\t\t($1, $2, $3, $4)\n\t\t\tRETURNING\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, upload_complete, date_modified, date_created;",
+  "query": "INSERT INTO Panels\n\t\t\t\t(comic_id, number, bytes_original, bytes_compressed)\n\t\t\tVALUES\n\t\t\t\t($1, $2, $3, $4)\n\t\t\tON CONFLICT (comic_id, number)\n\t\t\tDO UPDATE SET\n            revision = Panels.revision + 1,\n            bytes_original = EXCLUDED.bytes_original,\n            bytes_compressed = EXCLUDED.bytes_compressed,\n            date_modified = now()\n\t\t\tRETURNING\n\t\t\t\tcomic_id, number, revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created;",
   "describe": {
     "columns": [
       {
@@ -16,23 +16,23 @@
       },
       {
         "ordinal": 1,
-        "name": "panel_number",
+        "name": "number",
         "type_info": "Numeric",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_number"
+            "name": "number"
           }
         }
       },
       {
         "ordinal": 2,
-        "name": "panel_revision",
+        "name": "revision",
         "type_info": "Int4",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_revision"
+            "name": "revision"
           }
         }
       },
@@ -60,17 +60,6 @@
       },
       {
         "ordinal": 5,
-        "name": "upload_complete",
-        "type_info": "Bool",
-        "origin": {
-          "Table": {
-            "table": "panels",
-            "name": "upload_complete"
-          }
-        }
-      },
-      {
-        "ordinal": 6,
         "name": "date_modified",
         "type_info": "Timestamptz",
         "origin": {
@@ -81,7 +70,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 6,
         "name": "date_created",
         "type_info": "Timestamptz",
         "origin": {
@@ -107,9 +96,8 @@
       false,
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "2919aa2a115ee1965a605612fbe89d4263dd8ed0096b14a560f48864b3bec10d"
+  "hash": "1101572cd09afa2b63ea18c4f3a4e45cd7fa8a7c3421799a43751ac7c74e4bf1"
 }

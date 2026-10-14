@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT\n\t\t\t\tcomic_id, panel_number, panel_revision, bytes_original,\n\t\t\t\tbytes_compressed, upload_complete, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY panel_number ASC;",
+  "query": "SELECT\n\t\t\t\tcomic_id, number, revision, bytes_original,\n\t\t\t\tbytes_compressed, date_modified, date_created\n\t\t\tFROM Panels\n\t\t\tWHERE comic_id = $1\n\t\t\tORDER BY number ASC;",
   "describe": {
     "columns": [
       {
@@ -16,23 +16,23 @@
       },
       {
         "ordinal": 1,
-        "name": "panel_number",
+        "name": "number",
         "type_info": "Numeric",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_number"
+            "name": "number"
           }
         }
       },
       {
         "ordinal": 2,
-        "name": "panel_revision",
+        "name": "revision",
         "type_info": "Int4",
         "origin": {
           "Table": {
             "table": "panels",
-            "name": "panel_revision"
+            "name": "revision"
           }
         }
       },
@@ -60,17 +60,6 @@
       },
       {
         "ordinal": 5,
-        "name": "upload_complete",
-        "type_info": "Bool",
-        "origin": {
-          "Table": {
-            "table": "panels",
-            "name": "upload_complete"
-          }
-        }
-      },
-      {
-        "ordinal": 6,
         "name": "date_modified",
         "type_info": "Timestamptz",
         "origin": {
@@ -81,7 +70,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 6,
         "name": "date_created",
         "type_info": "Timestamptz",
         "origin": {
@@ -104,9 +93,8 @@
       false,
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "4889ce79a95fd403c66be8db3fef03c8fb6825fa8c37dfdb71e2ec6c46618b22"
+  "hash": "90d96a01e5d97d609fd629cfc610831cff316745c835ed049055cd5d8b408ba0"
 }
