@@ -233,7 +233,7 @@ async function deletePanel(number) {
 	const panel = document.getElementById(`active-${number}`);
 	const dialog = document.getElementById(number);
 	try {
-		await DeleteReq(number);
+		await deleteReq(number);
 	} catch (error) {
 		alert(error.message);
 	}
@@ -241,7 +241,7 @@ async function deletePanel(number) {
 	panel.remove();
 }
 
-function DeleteReq(panel_number) {
+function deleteReq(panel_number) {
 	const upload = window.document.getElementById("panel-upload");
 	const comic_id = upload.getAttribute("data-comic-id");
 	return new Promise((resolve, reject) => {
@@ -255,6 +255,36 @@ function DeleteReq(panel_number) {
 		};
 		xhr.onerror = () => {
 			reject(new Error(`Failed to delete panel: ${file.name}`));
+		};
+		xhr.send();
+	});
+}
+
+function copyText(text) {
+	navigator.clipboard.writeText(text);
+}
+
+async function copyBbcode(comic_id) {
+	try {
+		let bbcode = await bbcodeReq(comic_id);
+		navigator.clipboard.writeText(bbcode);
+	} catch (error) {
+		alert(error.message);
+	}
+}
+
+function bbcodeReq(comic_id) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("GET", `/comics/manage/${comic_id}/bbcode`);
+		xhr.onload = () => {
+			if (xhr.status < 200 || xhr.status >= 300) {
+				return reject(new Error('Error getting bbcode.'));
+			}
+			return resolve(xhr.responseText);
+		};
+		xhr.onerror = () => {
+			reject(new Error('Failed to get bbcode.'));
 		};
 		xhr.send();
 	});

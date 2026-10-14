@@ -138,6 +138,7 @@ async fn main() -> Result<()> {
 			.service(get_user)
 			.service(get_comics)
 			.service(get_manage_comic)
+			.service(get_comic_bbcode)
 			.service(set_new_comic)
 			.service(set_rename_comic)
 			.service(set_comic_panel)

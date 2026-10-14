@@ -356,3 +356,22 @@ pub async fn set_delete_panel(
 	db.delete_panel(comic_id, number).await?;
 	Ok(HttpResponse::Ok().finish())
 }
+
+#[get("/comics/manage/{id}/bbcode")]
+pub async fn get_comic_bbcode(
+	path: Path<i32>, mut db: ThinData<Db>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let id = path.into_inner();
+	let comic = db.get_comic_by_id(id).await?;
+	let panels = db.get_all_panels_by_comic(comic.id).await?;
+	let mut bbcode = String::from("[center]\n");
+	for panel in panels {
+		bbcode.push_str("[img]");
+		bbcode.push_str(&panel.link());
+		bbcode.push_str("[/img]\n");
+	}
+	bbcode.push_str("[/center]");
+	Ok(HttpResponse::Ok()
+		.content_type("text/plain; charset=utf-8")
+		.body(bbcode))
+}

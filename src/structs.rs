@@ -1,3 +1,4 @@
+use crate::SITE_LINK;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -50,6 +51,16 @@ pub struct Comic {
 	pub date_created: DateTime<Utc>,
 }
 
+impl Comic {
+	pub fn link(&self) -> String {
+		format!("/comics/{}", self.url_stub)
+	}
+
+	pub fn full_link(&self) -> String {
+		format!("{SITE_LINK}/comics/{}", self.url_stub)
+	}
+}
+
 #[derive(Debug, Clone)]
 pub struct Panel {
 	pub comic_id: i32,
@@ -68,6 +79,13 @@ impl Panel {
 
 	pub fn previous_key(&self) -> String {
 		format!("{}/{}-{}", self.comic_id, self.number, self.revision - 1)
+	}
+
+	pub fn link(&self) -> String {
+		format!(
+			"https://r2.pony.sh/{}/{}-{}",
+			self.comic_id, self.number, self.revision
+		)
 	}
 }
 

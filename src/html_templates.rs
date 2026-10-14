@@ -213,16 +213,23 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>) -> String {
 pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 	let heading = format!("{} - Manage", comic.title);
 	let title: String = format!("{heading} - {SITE_NAME}");
-	let description = "Comic renaming and panel management.";
+	let description = "Comic and panel management.";
 	let link = format!("{SITE_LINK}/comics/manage/{}", comic.url_stub);
 	let mane = html! {
-		h1 { (heading) }
+		h1 { a href = (comic.link()) { (comic.title) sup { "↗" } } " - Manage" }
 		p { (description) }
 		h2 { "Rename Comic" }
 		form class = "row" method = "get" action = (format!("/comics/rename/{}", comic.id)) {
 			label for = "title" { "Title:" }
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Rename" }
+		}
+		h2 { "Copy Data" }
+		p { "Copy relevant data to the comic." }
+		span class = "row" {
+			button onclick = (format!(r#"copyText("{}")"#, comic.full_link())) { "Copy Link" }
+			button onclick = (format!(r#"copyText("{}")"#, comic.title)) { "Copy Title" }
+			button onclick = (format!(r#"copyBbcode("{}")"#, comic.id)) { "Copy BBCode" }
 		}
 		h2 { "Upload Panels" }
 		label { "Select and upload comic panels." }
