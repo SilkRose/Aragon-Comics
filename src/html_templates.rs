@@ -248,6 +248,70 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			button onclick = (format!(r#"copyText("{}")"#, comic.title)) { "Copy Title" }
 			button onclick = (format!(r#"copyBbcode("{}")"#, comic.id)) { "Copy BBCode" }
 		}
+		h2 { "Deletions" }
+		p { "Delete all panels and/or the comic as a whole." }
+		span class = "row" {
+			@if !panels.is_empty() {
+				button class = "danger" onclick = r#"openDialog("delete-panels")"# { "Delete Panels" }
+				dialog id = "delete-panels" closedby = "any" {
+					h2 { "Delete Panels" }
+					p {
+						"Delete all "
+						(panels.len())
+						" panels for this comic."
+					}
+					form
+						id = "delete-panels-form" method = "post"
+						action = (format!{"/comics/manage/{}/panels/delete", comic.id}) {
+						span class = "row" {
+							input type = "checkbox" id = "delete-1" name = "delete-1" value = "true" autocomplete = "off" {}
+							label for = "delete-1" { "Are you sure?" }
+						}
+						span class = "row" {
+							input type = "checkbox" id = "delete-2" name = "delete-2" value = "true" autocomplete = "off" {}
+							label for = "delete-2" { "Are you super sure?" }
+						}
+						span class = "row" {
+							input type = "checkbox" id = "delete-3" name = "delete-3" value = "true" autocomplete = "off" {}
+							label for = "delete-3" { "Are you super-duper sure?" }
+						}
+					}
+					span class = "spaced-row" {
+						button onclick = r#"closeDialog("delete-panels")"# { "Close" }
+						button form = "delete-panels-form" class = "danger" { "Delete" }
+					}
+				}
+			}
+			button class = "danger" onclick = r#"openDialog("delete-comic")"# { "Delete Comic" }
+			dialog id = "delete-comic" closedby = "any" {
+				h2 { "Delete Comic" }
+				p {
+					"Delete the comic and all "
+					(panels.len())
+					" panels."
+				}
+				form
+					id = "delete-comic-form" method = "post"
+					action = (format!{"/comics/manage/{}/delete", comic.id}) {
+					span class = "row" {
+						input type = "checkbox" id = "delete-1" name = "delete-1" value = "true" autocomplete = "off" {}
+						label for = "delete-1" { "Are you sure?" }
+					}
+					span class = "row" {
+						input type = "checkbox" id = "delete-2" name = "delete-2" value = "true" autocomplete = "off" {}
+						label for = "delete-2" { "Are you super sure?" }
+					}
+					span class = "row" {
+						input type = "checkbox" id = "delete-3" name = "delete-3" value = "true" autocomplete = "off" {}
+						label for = "delete-3" { "Are you super-duper sure?" }
+					}
+				}
+				span class = "spaced-row" {
+					button onclick = r#"closeDialog("delete-comic")"# { "Close" }
+					button form = "delete-comic-form" class = "danger" { "Delete" }
+				}
+			}
+		}
 		h2 { "Upload Panels" }
 		p { label { "Select and upload comic panels." } }
 		input
@@ -256,10 +320,8 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 			accept = "image/png"
 			class = "hidden"
 			onchange = "previewFiles()"
+			autocomplete = "off"
 			multiple {}
-		script {
-			"document.getElementById('pony-up').value = null;"
-		}
 		span class = "row" {
 			button onclick = "selectFiles()" { "Select Files" }
 			button
