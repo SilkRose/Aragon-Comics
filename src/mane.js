@@ -289,3 +289,31 @@ function bbcodeReq(comic_id) {
 		xhr.send();
 	});
 }
+
+async function deletePanels() {
+	const check1 = document.getElementById("delete-panel-1").checked;
+	const check2 = document.getElementById("delete-panel-2").checked;
+	const check3 = document.getElementById("delete-panel-3").checked;
+	if (!check1 || !check2 || !check3) {
+		alert("Check all 3 checkboxes to perform this action.")
+		return;
+	}
+	const panels = document.getElementById("active-panels").children;
+	const dialog = document.getElementById("delete-panels");
+	dialog.closedBy = "none";
+	const new_dialog = document.createElement("dialog");
+	const dialog_header = document.createElement("h2");
+	dialog_header.innerText = "Delete Panels";
+	new_dialog.appendChild(dialog_header);
+	dialog.innerHTML = new_dialog.innerHTML;
+	for (const panel of panels) {
+		let number = panel.getAttribute("data-panel-number");
+		console.log(number);
+		continue;
+		try {
+			await deleteReq(number);
+		} catch (error) {
+			alert(error.message);
+		}
+	}
+}

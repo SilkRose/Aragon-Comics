@@ -260,25 +260,24 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 						(panels.len())
 						" panels for this comic."
 					}
-					form
-						id = "delete-panels-form" method = "post"
-						action = (format!{"/comics/manage/{}/panels/delete", comic.id}) {
-						span class = "row" {
-							input type = "checkbox" id = "delete-1" name = "delete-1" value = "true" autocomplete = "off" {}
-							label for = "delete-1" { "Are you sure?" }
-						}
-						span class = "row" {
-							input type = "checkbox" id = "delete-2" name = "delete-2" value = "true" autocomplete = "off" {}
-							label for = "delete-2" { "Are you super sure?" }
-						}
-						span class = "row" {
-							input type = "checkbox" id = "delete-3" name = "delete-3" value = "true" autocomplete = "off" {}
-							label for = "delete-3" { "Are you super-duper sure?" }
-						}
+					span class = "row" {
+						input type = "checkbox" id = "delete-panel-1" name = "delete-panel-1" autocomplete = "off" {}
+						label for = "delete-panel-1" { "Are you sure?" }
+					}
+					span class = "row" {
+						input type = "checkbox" id = "delete-panel-2" name = "delete-panel-2" autocomplete = "off" {}
+						label for = "delete-panel-2" { "Are you super sure?" }
+					}
+					span class = "row" {
+						input type = "checkbox" id = "delete-panel-3" name = "delete-panel-3" autocomplete = "off" {}
+						label for = "delete-panel-3" { "Are you super-duper sure?" }
 					}
 					span class = "spaced-row" {
 						button onclick = r#"closeDialog("delete-panels")"# { "Close" }
-						button form = "delete-panels-form" class = "danger" { "Delete" }
+						button
+							class = "danger"
+							onclick = "deletePanels()"
+							{ "Delete" }
 					}
 				}
 			}
@@ -350,7 +349,10 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		h2 { "Active Panels" }
 		div id = "active-panels" class = "manage-panels" {
 			@for panel in panels {
-				div id = (format!("active-{}", panel.number)) class = "panel-div" {
+				div
+					id = (format!("active-{}", panel.number))
+					data-panel-number = (panel.number)
+					class = "panel-div" {
 					img class = "panel" src = (format!("https://r2.pony.sh/{}", panel.key())) {}
 					div class = "panel-info" {
 						p {
