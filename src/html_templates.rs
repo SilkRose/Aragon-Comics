@@ -261,22 +261,22 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 						" panels for this comic."
 					}
 					span class = "row" {
-						input type = "checkbox" id = "delete-panel-1" name = "delete-panel-1" autocomplete = "off" {}
-						label for = "delete-panel-1" { "Are you sure?" }
+						input type = "checkbox" id = "delete-panels-1" name = "delete-panels-1" autocomplete = "off" {}
+						label for = "delete-panels-1" { "Are you sure?" }
 					}
 					span class = "row" {
-						input type = "checkbox" id = "delete-panel-2" name = "delete-panel-2" autocomplete = "off" {}
-						label for = "delete-panel-2" { "Are you super sure?" }
+						input type = "checkbox" id = "delete-panels-2" name = "delete-panels-2" autocomplete = "off" {}
+						label for = "delete-panels-2" { "Are you super sure?" }
 					}
 					span class = "row" {
-						input type = "checkbox" id = "delete-panel-3" name = "delete-panel-3" autocomplete = "off" {}
-						label for = "delete-panel-3" { "Are you super-duper sure?" }
+						input type = "checkbox" id = "delete-panels-3" name = "delete-panels-3" autocomplete = "off" {}
+						label for = "delete-panels-3" { "Are you super-duper sure?" }
 					}
 					span class = "spaced-row" {
 						button onclick = r#"closeDialog("delete-panels")"# { "Close" }
 						button
 							class = "danger"
-							onclick = "deletePanels()"
+							onclick = r#"deleteData("panels")"#
 							{ "Delete" }
 					}
 				}
@@ -289,25 +289,24 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 					(panels.len())
 					" panels."
 				}
-				form
-					id = "delete-comic-form" method = "post"
-					action = (format!{"/comics/manage/{}/delete", comic.id}) {
-					span class = "row" {
-						input type = "checkbox" id = "delete-1" name = "delete-1" value = "true" autocomplete = "off" {}
-						label for = "delete-1" { "Are you sure?" }
-					}
-					span class = "row" {
-						input type = "checkbox" id = "delete-2" name = "delete-2" value = "true" autocomplete = "off" {}
-						label for = "delete-2" { "Are you super sure?" }
-					}
-					span class = "row" {
-						input type = "checkbox" id = "delete-3" name = "delete-3" value = "true" autocomplete = "off" {}
-						label for = "delete-3" { "Are you super-duper sure?" }
-					}
+				span class = "row" {
+					input type = "checkbox" id = "delete-comic-1" name = "delete-comic-1" autocomplete = "off" {}
+					label for = "delete-comic-1" { "Are you sure?" }
+				}
+				span class = "row" {
+					input type = "checkbox" id = "delete-comic-2" name = "delete-comic-2" autocomplete = "off" {}
+					label for = "delete-comic-2" { "Are you super sure?" }
+				}
+				span class = "row" {
+					input type = "checkbox" id = "delete-comic-3" name = "delete-comic-3" autocomplete = "off" {}
+					label for = "delete-comic-3" { "Are you super-duper sure?" }
 				}
 				span class = "spaced-row" {
 					button onclick = r#"closeDialog("delete-comic")"# { "Close" }
-					button form = "delete-comic-form" class = "danger" { "Delete" }
+					button
+						class = "danger"
+						onclick = r#"deleteData("comic")"#
+						{ "Delete" }
 				}
 			}
 		}

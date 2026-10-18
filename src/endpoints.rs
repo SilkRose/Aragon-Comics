@@ -376,3 +376,21 @@ pub async fn get_comic_bbcode(
 		.content_type("text/plain; charset=utf-8")
 		.body(bbcode))
 }
+
+#[get("/comics/manage/{comic_id}/delete")]
+pub async fn set_delete_comic(
+	path: Path<i32>, mut db: ThinData<Db>, _: SessionInfo,
+) -> Result<impl Responder> {
+	let comic_id = path.into_inner();
+	let Ok(_) = db.get_comic_by_id(comic_id).await else {
+		return Ok(HttpResponse::NotFound().finish());
+	};
+	let panels = db.get_all_panels_by_comic(comic_id).await?;
+	if !panels.is_empty() {
+		return Ok(HttpResponse::BadRequest().finish());
+	}
+	db.delete_comic(comic_id).await?;
+	Ok(HttpResponse::SeeOther()
+		.append_header(("Location", "/comics"))
+		.finish())
+}

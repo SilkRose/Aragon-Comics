@@ -290,30 +290,71 @@ function bbcodeReq(comic_id) {
 	});
 }
 
-async function deletePanels() {
-	const check1 = document.getElementById("delete-panel-1").checked;
-	const check2 = document.getElementById("delete-panel-2").checked;
-	const check3 = document.getElementById("delete-panel-3").checked;
+let abort_deletion = false;
+
+function cancelDeletion() {
+	abort_deletion = true;
+}
+
+async function deleteData(id) {
+	abort_deletion = false;
+	const upload = window.document.getElementById("panel-upload");
+	const comic_id = upload.getAttribute("data-comic-id");
+	const check1 = document.getElementById(`delete-${id}-1`).checked;
+	const check2 = document.getElementById(`delete-${id}-2`).checked;
+	const check3 = document.getElementById(`delete-${id}-3`).checked;
 	if (!check1 || !check2 || !check3) {
 		alert("Check all 3 checkboxes to perform this action.")
 		return;
 	}
-	const panels = document.getElementById("active-panels").children;
-	const dialog = document.getElementById("delete-panels");
+	const panel_children = document.getElementById("active-panels").children;
+	const count = panel_children.length;
+	if (count == 0 && id == "panels") {
+		alert("No panels to delete.")
+		return;
+	}
+	const panels = Array.from(panel_children);
+	panels.sort((a, b) =>
+		Number(a.getAttribute("data-panel-number")) -
+		Number(b.getAttribute("data-panel-number"))
+	);
+	const dialog = document.getElementById(`delete-${id}`);
 	dialog.closedBy = "none";
 	const new_dialog = document.createElement("dialog");
 	const dialog_header = document.createElement("h2");
-	dialog_header.innerText = "Delete Panels";
+	dialog_header.innerText = dialog.firstChild.innerText;
 	new_dialog.appendChild(dialog_header);
+	const new_text = `<label for="delete-progress"><p>Deleting panel <span id="delete-index">1</span>/${count}</p></label>`;
+	new_dialog.innerHTML += new_text;
+	const progress = `<progress id="delete-progress" max="${count}"></progress>`;
+	new_dialog.innerHTML += progress;
+	const button = `<button class="danger" onclick="cancelDeletion()">Abort</button>`;
+	new_dialog.innerHTML += button;
 	dialog.innerHTML = new_dialog.innerHTML;
+	const panel_index = window.document.getElementById("delete-index");
+	const panel_progress = window.document.getElementById("delete-progress");
+	let i = 1;
 	for (const panel of panels) {
+		if (abort_deletion) {
+			dialog.close();
+			window.document.location.reload();
+			return;
+		}
+		panel_index.innerText = i;
+		panel_progress.value = i;
 		let number = panel.getAttribute("data-panel-number");
 		console.log(number);
-		continue;
 		try {
 			await deleteReq(number);
 		} catch (error) {
 			alert(error.message);
 		}
+		panel.remove();
+		i++;
+	}
+	if (id === "panels") {
+		dialog.close();
+	} else {
+		window.document.location = `/comics/manage/${comic_id}/delete`;
 	}
 }
