@@ -394,3 +394,16 @@ pub async fn set_delete_comic(
 		.append_header(("Location", "/comics"))
 		.finish())
 }
+
+#[get("/comics/{title}")]
+pub async fn get_comic(
+	path: Path<String>, mut db: ThinData<Db>, session: MaybeSessionInfo,
+) -> Result<impl Responder> {
+	let title = path.into_inner();
+	let comic = db.get_comic_by_url_count_hit(&title).await?;
+	let panels = db.get_all_panels_by_comic(comic.id).await?;
+	let page = read_comic_html(comic, panels, session.session_info.is_some());
+	Ok(HttpResponse::Ok()
+		.content_type("text/html; charset=utf-8")
+		.body(page))
+}

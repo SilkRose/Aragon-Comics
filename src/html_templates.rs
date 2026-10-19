@@ -438,6 +438,26 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		.call()
 }
 
+pub fn read_comic_html(comic: Comic, panels: Vec<Panel>, admin: bool) -> String {
+	let heading = comic.title.to_string();
+	let title: String = format!("{heading} - {SITE_NAME}");
+	let description = "Comic and panel management.";
+	let link = format!("{SITE_LINK}/comics/{}", comic.url_stub);
+	let mane = html! {
+		h1 { (heading) }
+		@for panel in panels {
+			div class = "panel" {
+				img src = (format!("https://r2.pony.sh/{}", panel.key())) {}
+			}
+		}
+	};
+	html_builder()
+		.head(head_html(&title, description, &link))
+		.header(header_html(Pages::Comics, admin))
+		.mane(mane)
+		.call()
+}
+
 // HTML components go below this comment:
 
 pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<String> {
