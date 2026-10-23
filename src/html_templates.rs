@@ -63,7 +63,7 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 			@let link = format!("/user/remove/{}", user.id);
 			button
 				class = "danger"
-				onclick = (format!(r#"openDialog("{}")"#, user.id))
+				onclick = (format!("openDialog({})", user.id))
 					{ "Remove" }
 			dialog id = (user.id) closedby = "any" {
 				h2 { "Remove User" }
@@ -73,7 +73,7 @@ fn authorized_user_html(users: Vec<User>) -> PreEscaped<String> {
 					" from the authorized users list?"
 				}
 				span class = "spaced-row" {
-					button onclick = (format!(r#"closeDialog("{}")"#, user.id)) { "Close" }
+					button onclick = (format!("closeDialog({})", user.id)) { "Close" }
 					button
 						type = "button"
 						class = "danger"
@@ -246,7 +246,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 		span class = "row" {
 			button onclick = (format!(r#"copyText("{}")"#, comic.full_link())) { "Copy Link" }
 			button onclick = (format!(r#"copyText("{}")"#, comic.title)) { "Copy Title" }
-			button onclick = (format!(r#"copyBbcode("{}")"#, comic.id)) { "Copy BBCode" }
+			button onclick = (format!("copyBbcode({})", comic.id)) { "Copy BBCode" }
 		}
 		h2 { "Deletions" }
 		p { "Delete all panels and/or the comic as a whole." }
@@ -371,7 +371,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 						}
 						button
 							class = "danger"
-							onclick = (format!(r#"openDialog("{}")"#, panel.number))
+							onclick = (format!(r#"openDialog({})"#, panel.number))
 							{ "Delete" }
 					}
 					dialog id = (panel.number) closedby = "any" {
@@ -380,11 +380,11 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 						p { "Are you sure you want to delete delete this panel?" }
 						span class = "spaced-row" {
 							button
-								onclick = (format!(r#"closeDialog("{}")"#, panel.number))
+								onclick = (format!("closeDialog({})", panel.number))
 								{ "Close" }
 							button
 								class = "danger"
-								onclick = (format!(r#"deletePanel("{}")"#, panel.number))
+								onclick = (format!("deletePanel({})", panel.number))
 								{ "Delete" }
 						}
 					}
