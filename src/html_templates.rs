@@ -1,4 +1,5 @@
 use crate::structs::*;
+use crate::utility::{css_url, js_url};
 use crate::{SITE_LINK, SITE_NAME};
 use bon::builder;
 use maud::{DOCTYPE, PreEscaped, html};
@@ -466,7 +467,7 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 		meta charset = "UTF-8";
 		meta http-equiv = "X-UA-Compatible" content = "IE=edge";
 		meta name = "viewport" content = "width=device-width,initial-scale=1";
-		link rel = "stylesheet" crossorigin href = "/style.css";
+		link rel = "stylesheet" href = (css_url());
 		link rel = "canonical" href = (link);
 		meta property = "og:title" content = (title);
 		meta property = "og:description" content = (description);
@@ -476,12 +477,11 @@ pub fn head_html(title: &str, description: &str, link: &str) -> PreEscaped<Strin
 		meta property = "og:site_name" content = (SITE_NAME);
 		@let encode = encode_url(title);
 		link
-			crossorigin
 			rel = "alternate"
 			type = "application/json+oembed"
 			href = { "/oembed?" (encode) }
 			title = (title);
-		script crossorigin src = "/mane.js" {}
+		script src = (js_url()) {}
 
 	}
 }
