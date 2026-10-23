@@ -9,6 +9,11 @@ use actix_web::web::{Data, Path, Payload, Query, ThinData};
 use actix_web::{HttpRequest, HttpResponse, Responder, delete, get, post};
 use aws_sdk_s3::Client;
 use lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
+use oxc_allocator::Allocator;
+use oxc_codegen::{Codegen, CodegenOptions};
+use oxc_minifier::{Minifier, MinifierOptions};
+use oxc_parser::Parser;
+use oxc_span::SourceType;
 use oxipng::{Options, optimize_from_memory};
 use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
@@ -67,11 +72,58 @@ pub async fn parse_css() -> Result<String> {
 	}
 }
 
+#[cfg(not(debug_assertions))]
+static JS_FILE: OnceCell<Bytes> = OnceCell::const_new();
+
+#[cfg(not(debug_assertions))]
 #[get("/mane.js")]
 pub async fn get_js() -> Result<impl Responder> {
-	Ok(HttpResponse::Ok()
-		.content_type("text/javascript; charset=utf-8")
-		.body(fs::read_to_string("./src/mane.js").await?))
+	let js = JS_FILE
+		.get_or_init(|| async { Bytes::from(parse_js().await.unwrap_or_default()) })
+		.await;
+	match &js.is_empty() {
+		true => Ok(HttpResponse::InternalServerError().finish()),
+		false => Ok(HttpResponse::Ok()
+			.content_type("text/css; charset=utf-8")
+			.body(js.to_owned())),
+	}
+}
+
+#[cfg(debug_assertions)]
+#[get("/mane.js")]
+pub async fn get_js() -> Result<impl Responder> {
+	match parse_js().await {
+		Err(_) => Ok(HttpResponse::InternalServerError().finish()),
+		Ok(js) => Ok(HttpResponse::Ok()
+			.content_type("text/javascript; charset=utf-8")
+			.body(js)),
+	}
+}
+
+pub async fn parse_js() -> Result<String> {
+	let Ok(js_file) = fs::read_to_string("./src/mane.js").await else {
+		// print reading error here
+		return Err("Failed to read javascript file!".into());
+	};
+	let allocator = Allocator::default();
+	let parsed = Parser::new(&allocator, &js_file, SourceType::script()).parse();
+	for error in parsed.diagnostics {
+		eprintln!("{error}");
+	}
+	if parsed.fatal_error {
+		return Err("Failed to parse javascript file!".into());
+	}
+	let mut program = parsed.program;
+	let result = Minifier::new(MinifierOptions::default()).minify(&allocator, &mut program);
+	let output = Codegen::new()
+		.with_options(CodegenOptions {
+			minify: true,
+			..CodegenOptions::default()
+		})
+		.with_scoping(result.scoping)
+		.with_private_member_mappings(result.class_private_mappings)
+		.build(&program);
+	Ok(output.code)
 }
 
 #[get("/user")]

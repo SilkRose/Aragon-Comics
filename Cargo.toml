@@ -19,6 +19,11 @@ chrono = { version = "0.4.45", features = ["serde"] }
 dotenvy = { version = "0.15.7" }
 lightningcss = { version = "1.0.0-alpha.72" }
 maud = { version = "0.27.0" }
+oxc_allocator = { version = "0.155.0" }
+oxc_codegen = { version = "0.155.0" }
+oxc_minifier = { version = "0.155.0" }
+oxc_parser = { version = "0.155.0" }
+oxc_span = { version = "0.155.0" }
 oxipng = { version = "10.2.1", default-features = false, features = [
 	"freestanding",
 ] }
