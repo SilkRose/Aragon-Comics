@@ -352,7 +352,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 					id = (format!("active-{}", panel.number))
 					data-panel-number = (panel.number)
 					class = "panel-div" {
-					img class = "panel" src = (format!("https://r2.pony.sh/{}", panel.key())) {}
+					img class = "panel" src = (format!("https://r2.pony.sh/{}", panel.key())) loading = "lazy" {}
 					div class = "panel-info" {
 						p {
 							b { "Number: " }
@@ -376,7 +376,7 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 					}
 					dialog id = (panel.number) closedby = "any" {
 						h2 { "Delete Panel" }
-						img src = (format!("https://r2.pony.sh/{}", panel.key())) {}
+						img src = (format!("https://r2.pony.sh/{}", panel.key())) loading = "lazy" {}
 						p { "Are you sure you want to delete delete this panel?" }
 						span class = "spaced-row" {
 							button
@@ -447,7 +447,7 @@ pub fn read_comic_html(comic: Comic, panels: Vec<Panel>, admin: bool) -> String 
 		h1 { (heading) }
 		@for panel in panels {
 			div class = "panel" {
-				img src = (format!("https://r2.pony.sh/{}", panel.key())) {}
+				img src = (format!("https://r2.pony.sh/{}", panel.key())) loading = "lazy" {}
 			}
 		}
 	};
