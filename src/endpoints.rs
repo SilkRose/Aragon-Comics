@@ -193,11 +193,14 @@ async fn oembed(query: Query<OEmbed>) -> Result<impl Responder> {
 		.json(embed))
 }
 
-#[get("/comics/new")]
+#[post("/comics/new")]
 pub async fn set_new_comic(
-	queries: Query<HashMap<String, String>>, mut db: ThinData<Db>, _: SessionInfo,
+	body: String, mut db: ThinData<Db>, _: SessionInfo,
 ) -> Result<impl Responder> {
-	let Some(title) = queries.into_inner().get("title").cloned() else {
+	let Some(title) = serde_urlencoded::from_str::<HashMap<String, String>>(&body)?
+		.get("title")
+		.cloned()
+	else {
 		let msg = "Missing title parameter.";
 		return Ok(HttpResponse::BadRequest().body(msg));
 	};

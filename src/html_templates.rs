@@ -170,7 +170,7 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>, data: ComicData) -> Stri
 		h1 { (heading) }
 		p { (description) }
 		h2 { "New Comic" }
-		form class = "row" method = "get" action = "/comics/new" {
+		form class = "row" method = "post" action = "/comics/new" {
 			label for = "title" { "Title:" }
 			(input_text_required("title", "title", 1, 256))
 			button type = "submit" { "Create" }
