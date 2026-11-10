@@ -9,21 +9,21 @@ license = "MIT"
 publish = false
 
 [dependencies]
-actix-files = { version = "0.7.0" }
-actix-web = { version = "4.15.0", features = ["macros"] }
+actix-files = { version = "0.7.4" }
+actix-web = { version = "4.19.0", features = ["macros"] }
 anyhow = { version = "1.0.104" }
-aws-sdk-s3 = { version = "1.150.0" }
+aws-sdk-s3 = { version = "1.158.0" }
 base64ct = { version = "1.8.3", features = ["std"] }
 bon = { version = "3.10.1" }
 chrono = { version = "0.4.45", features = ["serde"] }
 dotenvy = { version = "0.15.7" }
 lightningcss = { version = "1.0.0-alpha.72" }
 maud = { version = "0.27.0" }
-oxc_allocator = { version = "0.155.0" }
-oxc_codegen = { version = "0.155.0" }
-oxc_minifier = { version = "0.155.0" }
-oxc_parser = { version = "0.155.0" }
-oxc_span = { version = "0.155.0" }
+oxc_allocator = { version = "0.158.0" }
+oxc_codegen = { version = "0.158.0" }
+oxc_minifier = { version = "0.158.0" }
+oxc_parser = { version = "0.158.0" }
+oxc_span = { version = "0.158.0" }
 oxipng = { version = "10.2.1", default-features = false, features = [
 	"freestanding",
 ] }
@@ -35,7 +35,7 @@ rand = { version = "0.10.3", default-features = false, features = [
 reqwest = { version = "0.13.5", features = ["json", "form"] }
 rust_decimal = { version = "1.43.0" }
 serde = { version = "1.0.229", features = ["derive"] }
-serde-json = { version = "1.0.151", package = "serde_json" }
+serde-json = { version = "1.0.154", package = "serde_json" }
 serde-urlencoded = { version = "0.7.1", package = "serde_urlencoded" }
 sqlx = { version = "0.9.0", default-features = false, features = [
 	"chrono",
@@ -46,7 +46,7 @@ sqlx = { version = "0.9.0", default-features = false, features = [
 	"tls-rustls",
 	"rust_decimal",
 ] }
-tokio = { version = "1.53.1", default-features = false }
+tokio = { version = "1.54.1", default-features = false }
 url = { version = "2.5.8" }
 
 [build-dependencies]
