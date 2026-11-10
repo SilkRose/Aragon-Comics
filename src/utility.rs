@@ -1,4 +1,7 @@
 use actix_web::HttpRequest;
+use pony::number_format::linear_units::{
+	BINARY_DIVISOR_I64, METRIC_BYTE_ABBREVIATIONS, format_number_unit_i64,
+};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn redirect(req: HttpRequest) -> String {
@@ -35,4 +38,16 @@ fn unix_timestamp() -> u64 {
 		.duration_since(UNIX_EPOCH)
 		.unwrap_or_default()
 		.as_secs()
+}
+
+pub fn format_bytes(bytes: i64) -> String {
+	format_number_unit_i64()
+		.number(bytes)
+		.decimal_places(2)
+		.divisor(BINARY_DIVISOR_I64)
+		.units(&METRIC_BYTE_ABBREVIATIONS)
+		.spaced(true)
+		.trim_tail(true)
+		.plural_ess(false)
+		.call()
 }

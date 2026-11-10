@@ -1,11 +1,9 @@
 use crate::structs::*;
-use crate::utility::{css_url, js_url};
+use crate::utility::{css_url, format_bytes, js_url};
 use crate::{SITE_LINK, SITE_NAME};
 use bon::builder;
 use maud::{DOCTYPE, PreEscaped, html};
-use pony::bytes::FormatType::Abbreviation;
-use pony::bytes::format_size_bytes;
-use pony::number_format::{format_number_i128, format_number_u128};
+use pony::number_format::format_number_i128;
 use url::form_urlencoded;
 
 #[builder]
@@ -181,15 +179,15 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>, data: ComicData) -> Stri
 			b { "Comics: " }
 			(data.comics)
 			b { " Panels: " }
-			(format_number_u128(data.panels as u128).unwrap())
+			(format_number_i128(data.panels.into()))
 			b { " Panel Revisions: " }
-			(format_number_u128(data.revisions as u128).unwrap()) br;
+			(format_number_i128(data.revisions.into())) br;
 			b { "Bytes Original/Compressed: " }
-			(&format_size_bytes(data.bytes_original as f64, Abbreviation).unwrap())
+			(&format_bytes(data.bytes_original))
 			"/"
-			(&format_size_bytes(data.bytes_compressed as f64, Abbreviation).unwrap())
+			(&format_bytes(data.bytes_compressed))
 			b { " Page Hits: " }
-			(format_number_i128(data.page_hits).unwrap())
+			(format_number_i128(data.page_hits))
 		}
 		h2 { "Comic List" }
 		@for (comic, panel_data) in comics {
@@ -199,11 +197,11 @@ pub fn comic_html(comics: Vec<(Comic, ComicPanelData)>, data: ComicData) -> Stri
 					b { "Panels: " }
 					(panel_data.panel_count)
 					b { " Bytes Original/Compressed: " }
-					(&format_size_bytes(panel_data.bytes_original as f64, Abbreviation).unwrap())
+					(&format_bytes(panel_data.bytes_original.into()))
 					"/"
-					(&format_size_bytes(panel_data.bytes_compressed as f64, Abbreviation).unwrap())
+					(&format_bytes(panel_data.bytes_compressed.into()))
 					b { " Page Hits: " }
-					(format_number_u128(comic.page_hits as u128).unwrap())
+					(format_number_i128(comic.page_hits.into()))
 					" "
 					a href = (format!("/comics/manage/{}", comic.url_stub)) { "Manage" sup { "↗" } }
 				}
@@ -361,9 +359,9 @@ pub fn manage_comic_html(comic: Comic, panels: Vec<Panel>) -> String {
 							b { " Revision: " }
 							(panel.revision)
 							b { " Bytes Original/Compressed: " }
-							(format_size_bytes(panel.bytes_original as f64, Abbreviation).unwrap())
+							(format_bytes(panel.bytes_original.into()))
 							"/"
-							(format_size_bytes(panel.bytes_compressed as f64, Abbreviation).unwrap())
+							(format_bytes(panel.bytes_compressed.into()))
 							br;
 							b { "Created: " }
 							(&panel.date_created.format("%y-%m-%d %H:%M"))

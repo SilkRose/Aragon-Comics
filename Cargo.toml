@@ -27,7 +27,10 @@ oxc_span = { version = "0.158.0" }
 oxipng = { version = "10.2.1", default-features = false, features = [
 	"freestanding",
 ] }
-pony = { git = "https://github.com/SilkRose/Pony", rev = "03cf3b82e88ab86b69cdfd04361175238051463b" }
+pony = { git = "https://github.com/SilkRose/Pony", rev = "2802c5089477bd1952e85cdca6cd4e6750768d53", default-features = false, features = [
+	"fimfiction-api",
+	"number-format",
+] }
 rand = { version = "0.10.3", default-features = false, features = [
 	"chacha",
 	"sys_rng",
