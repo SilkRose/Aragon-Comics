@@ -2,6 +2,8 @@ use actix_web::HttpRequest;
 use pony::number_format::linear_units::{
 	BINARY_DIVISOR_I64, METRIC_BYTE_ABBREVIATIONS, format_number_unit_i64,
 };
+
+#[cfg(debug_assertions)]
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub fn redirect(req: HttpRequest) -> String {
