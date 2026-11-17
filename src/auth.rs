@@ -135,6 +135,23 @@ async fn fimfic_auth_return(
 		}
 	};
 
+	match db.get_user_opt(user_id).await {
+		Ok(user) => {
+			if user.is_none() {
+				return HttpResponse::Ok()
+					.content_type("text/plain")
+					.body("Disallowed user, only whitelisted users can login.");
+			}
+		}
+		Err(err) => {
+			eprintln!("{err}");
+			// todo present an actual error
+			return HttpResponse::Ok()
+				.content_type("text/plain")
+				.body(err.to_string());
+		}
+	};
+
 	let fimfic_user = match http_client.get_fimfic_user(user_id, &access_token).await {
 		Ok(res) => res,
 		Err(err) => {
