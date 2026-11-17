@@ -78,6 +78,38 @@ impl HttpClient {
 			access_token: res.access_token,
 		})
 	}
+
+	pub async fn fimfic_client_credentials(
+		&self, client_id: &str, client_secret: &str,
+	) -> Result<String> {
+		#[derive(Deserialize)]
+		struct Res {
+			access_token: String,
+			token_type: String,
+		}
+
+		let res = self
+			.post("https://www.fimfiction.net/api/v2/token", None)
+			.form::<[_]>(&[
+				("client_id", client_id),
+				("client_secret", client_secret),
+				("grant_type", "client_credentials"),
+			])
+			.send()
+			.await?
+			.bytes()
+			.await?;
+
+		let res = match serde_json::from_slice::<Res>(&res) {
+			Ok(v) => v,
+			Err(e) => {
+				println!("Failed to parse JSON: {e}");
+				return Err(Box::new(e));
+			}
+		};
+
+		Ok(res.access_token)
+	}
 }
 
 // internal only helper functions

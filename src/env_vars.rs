@@ -66,7 +66,7 @@ declare_env_fn! {
 	admin_id() -> "ADMIN_ID"
 
 	/// fimfic API key for updating the story
-	bearer_token() -> "BEARER_TOKEN"
+	(optional) bearer_token() -> "BEARER_TOKEN"
 
 	/// fimfic oauth2 client id
 	fimfic_client_id() -> "FIMFIC_CLIENT_ID"

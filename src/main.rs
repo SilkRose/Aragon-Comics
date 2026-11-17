@@ -49,23 +49,36 @@ async fn main() -> Result<()> {
 	let db = Db::new(&env_vars::database_url()).await?;
 	let mut db = Data(db);
 
-	let admin_id = env_vars::admin_id().parse::<i32>()?;
-	let bearer_token = env_vars::bearer_token();
+	let http_client = HttpClient::new().await?;
+	let http_client = Data(http_client);
 
 	let client_id = env_vars::fimfic_client_id();
+	let client_secret = env_vars::fimfic_client_secret();
+
+	let admin_id = env_vars::admin_id().parse::<i32>()?;
+
+	let mut bearer_token = env_vars::bearer_token();
+	if bearer_token.is_none() {
+		let token = http_client
+			.fimfic_client_credentials(&client_id, &client_secret)
+			.await?;
+		eprintln!("Bearer token not set in environment!");
+		eprintln!("Please add the following line to your .env file:");
+		eprintln!("BEARER_TOKEN={token}");
+		bearer_token = Some(token.into());
+	}
+	let bearer_token = bearer_token.unwrap();
+
 	let oauth_redirect_url = env_vars::fimfic_oauth_redirect_url();
 	let login_url = fimfic_cfg::make_login_url(&client_id, &oauth_redirect_url);
 	let fimfic_cfg = FimficCfg::builder()
 		.client_id(client_id)
-		.client_secret(env_vars::fimfic_client_secret())
+		.client_secret(client_secret)
 		.oauth_redirect_url(oauth_redirect_url)
 		.login_url(login_url)
 		.bearer_token(bearer_token.clone())
 		.build();
 	let fimfic = Data(fimfic_cfg);
-
-	let http_client = HttpClient::new().await?;
-	let http_client = Data(http_client);
 
 	let admin = match db.get_user_opt(admin_id).await? {
 		Some(admin) => admin,
