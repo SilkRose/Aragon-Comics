@@ -385,7 +385,7 @@ mod cookie {
 	pub fn create_session_cookie(token: &str) -> Cookie<'_> {
 		Cookie::build(SESSION_COOKIE_NAME, token)
 			.path(SESSION_COOKIE_PATH)
-			.max_age(Duration::days(30))
+			.max_age(Duration::days(365))
 			.same_site(SameSite::Lax)
 			.http_only(true)
 			.secure(true)
@@ -421,7 +421,7 @@ mod cookie {
 
 		Cookie::build(SESSION_INFO_COOKIE_NAME, value)
 			.path(SESSION_INFO_COOKIE_PATH)
-			.max_age(Duration::days(30))
+			.max_age(Duration::days(365))
 			.same_site(SameSite::Lax)
 			.http_only(false)
 			.secure(true)
